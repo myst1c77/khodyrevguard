@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Анализатор надежности паролей | KhodyrevGuard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Theme Switcher -->
+    <div class="theme-switcher">
+        <button class="theme-btn active" data-theme="original" onclick="switchTheme('original')" title="Оригинальная">
+            🎨
+            <span class="theme-tooltip">Оригинал</span>
+        </button>
+        <button class="theme-btn" data-theme="blue" onclick="switchTheme('blue')" title="Синяя">
+            🌊
+            <span class="theme-tooltip">Синяя</span>
+        </button>
+        <button class="theme-btn" data-theme="dark" onclick="switchTheme('dark')" title="Темная">
+            🌙
+            <span class="theme-tooltip">Темная</span>
+        </button>
+        <button class="theme-btn" data-theme="light" onclick="switchTheme('light')" title="Светлая">
+            ☀️
+            <span class="theme-tooltip">Светлая</span>
+        </button>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🔐</div>
+                <h1>KhodyrevGuard</h1>
+            </div>
+            <p class="subtitle">Профессиональный анализатор надежности паролей</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <div class="nav-tab active" onclick="switchPage('analyzer')">
+                <span>🔍</span>
+                <span>Анализатор</span>
+            </div>
+            <div class="nav-tab" onclick="switchPage('generator')">
+                <span>🎲</span>
+                <span>Генератор</span>
+            </div>
+            <div class="nav-tab" onclick="switchPage('hasher')">
+                <span>🔑</span>
+                <span>Шифратор</span>
+            </div>
+        </nav>
+
+        <!-- Analyzer Page -->
+        <div id="analyzerPage" class="page active">
+            <div class="main-card">
+                <div class="password-input-container">
+                    <input
+                        type="password"
+                        id="passwordInput"
+                        class="password-input"
+                        placeholder="Введите пароль для анализа..."
+                        autocomplete="off"
+                    >
+                    <button class="toggle-visibility" id="toggleBtn" onclick="togglePasswordVisibility()">
+                        👁️
+                    </button>
+                </div>
+
+                <div class="strength-visualization">
+                    <div class="strength-header">
+                        <div class="strength-title">
+                            <div class="strength-icon" id="strengthIcon">🔒</div>
+                            <span class="strength-text" id="strengthText">Введите пароль</span>
+                        </div>
+                        <div class="strength-score-container">
+                            <span class="strength-score" id="strengthScore">0/100</span>
+                            <span class="strength-badge" id="strengthBadge" style="display: none;">Слабый</span>
+                        </div>
+                    </div>
+
+                    <div class="strength-meter-container">
+                        <div class="strength-meter">
+                            <div class="strength-meter-fill" id="strengthMeter" style="width: 0%"></div>
+                        </div>
+                        <div class="strength-indicators">
+                            <div class="strength-indicator" data-level="1"></div>
+                            <div class="strength-indicator" data-level="2"></div>
+                            <div class="strength-indicator" data-level="3"></div>
+                            <div class="strength-indicator" data-level="4"></div>
+                            <div class="strength-indicator" data-level="5"></div>
+                        </div>
+                    </div>
+
+                    <div class="strength-details" id="strengthDetails" style="display: none;">
+                        <div class="strength-detail">
+                            <div class="detail-value" id="detailLength">0</div>
+                            <div class="detail-label">Символов</div>
+                        </div>
+                        <div class="strength-detail">
+                            <div class="detail-value" id="detailTypes">0</div>
+                            <div class="detail-label">Типов</div>
+                        </div>
+                        <div class="strength-detail">
+                            <div class="detail-value" id="detailStrength">0%</div>
+                            <div class="detail-label">Сила</div>
+                        </div>
+                    </div>
+
+                    <div class="strength-feedback" id="strengthFeedback" style="display: none;">
+                        <div class="feedback-message" id="feedbackMessage"></div>
+                        <div class="feedback-suggestion" id="feedbackSuggestion"></div>
+                    </div>
+                </div>
+
+                <div class="pwned-status" id="pwnedStatus">
+                    <span class="pwned-icon">⚠️</span>
+                    <span id="pwnedText"></span>
+                </div>
+
+                <div class="criteria-grid" id="criteriaGrid">
+                    <div class="criterion" data-criterion="length">
+                        <span class="criterion-icon">📏</span>
+                        <div class="criterion-text">
+                            <div>Минимум 12 символов (рекомендуется 16+)</div>
+                            <div class="criterion-hint">Добавьте больше символов для усиления пароля</div>
+                        </div>
+                    </div>
+                    <div class="criterion" data-criterion="uppercase">
+                        <span class="criterion-icon">🔠</span>
+                        <div class="criterion-text">
+                            <div>Заглавные буквы (A-Z)</div>
+                            <div class="criterion-hint">Используйте хотя бы одну заглавную букву</div>
+                        </div>
+                    </div>
+                    <div class="criterion" data-criterion="lowercase">
+                        <span class="criterion-icon">🔡</span>
+                        <div class="criterion-text">
+                            <div>Строчные буквы (a-z)</div>
+                            <div class="criterion-hint">Добавьте строчные буквы</div>
+                        </div>
+                    </div>
+                    <div class="criterion" data-criterion="numbers">
+                        <span class="criterion-icon">🔢</span>
+                        <div class="criterion-text">
+                            <div>Цифры (0-9)</div>
+                            <div class="criterion-hint">Включите хотя бы одну цифру</div>
+                        </div>
+                    </div>
+                    <div class="criterion" data-criterion="special">
+                        <span class="criterion-icon">⚡</span>
+                        <div class="criterion-text">
+                            <div>Специальные символы (!@#$%^&*)</div>
+                            <div class="criterion-hint">Добавьте специальные символы для большей безопасности</div>
+                        </div>
+                    </div>
+                    <div class="criterion" data-criterion="sequences">
+                        <span class="criterion-icon">🔄</span>
+                        <div class="criterion-text">
+                            <div>Без последовательностей (123, abc, qwerty)</div>
+                            <div class="criterion-hint">Избегайте простых последовательностей</div>
+                        </div>
+                    </div>
+                    <div class="criterion" data-criterion="repeating">
+                        <span class="criterion-icon">🔁</span>
+                        <div class="criterion-text">
+                            <div>Без повторяющихся символов (aaa, 111)</div>
+                            <div class="criterion-hint">Не используйте повторяющиеся символы подряд</div>
+                        </div>
+                    </div>
+                    <div class="criterion" data-criterion="dates">
+                        <span class="criterion-icon">📅</span>
+                        <div class="criterion-text">
+                            <div>Без дат рождения и годовщин</div>
+                            <div class="criterion-hint">Избегайте дат в любом формате (01.01.1990, 2000, jan1990)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="time-to-crack" id="timeToCrack" style="display: none;">
+                    <div class="time-label">Время взлома методом перебора:</div>
+                    <div class="time-value" id="crackTime">—</div>
+                </div>
+
+                <div class="entropy-info" id="entropyInfo" style="display: none;">
+                    <div class="entropy-stat">
+                        <div class="entropy-value" id="charsetSize">0</div>
+                        <div class="entropy-label">Размер набора</div>
+                    </div>
+                    <div class="entropy-stat">
+                        <div class="entropy-value" id="entropyBits">0</div>
+                        <div class="entropy-label">Бит энтропии</div>
+                    </div>
+                    <div class="entropy-stat">
+                        <div class="entropy-value" id="combinations">0</div>
+                        <div class="entropy-label">Комбинаций</div>
+                    </div>
+                </div>
+
+                <!-- Export Section -->
+                <div class="export-section" id="exportSection" style="display: none;">
+                    <button class="btn btn-export" id="exportBtn" onclick="toggleExportMenu()">
+                        <span class="export-icon">📥</span>
+                        <span>Экспорт результатов</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="export-dropdown" id="exportDropdown" style="display: none;">
+                        <div class="export-option" onclick="exportToTXT()">
+                            <span class="export-icon">📄</span>
+                            <div class="export-info">
+                                <div class="export-name">Простой текст (TXT)</div>
+                                <div class="export-desc">Читаемый текстовый отчёт</div>
+                            </div>
+                        </div>
+                        <div class="export-option" onclick="exportToJSON()">
+                            <span class="export-icon">📋</span>
+                            <div class="export-info">
+                                <div class="export-name">JSON</div>
+                                <div class="export-desc">Структурированные данные</div>
+                            </div>
+                        </div>
+                        <div class="export-option" onclick="exportToCSV()">
+                            <span class="export-icon">📊</span>
+                            <div class="export-info">
+                                <div class="export-name">CSV</div>
+                                <div class="export-desc">Таблица для Excel</div>
+                            </div>
+                        </div>
+                        <div class="export-option" onclick="exportToHTML()">
+                            <span class="export-icon">🌐</span>
+                            <div class="export-info">
+                                <div class="export-name">HTML отчёт</div>
+                                <div class="export-desc">Веб-страница со стилями</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tips-section">
+                <h2>💡 Советы по безопасности</h2>
+
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon">🧠</div>
+                        <div class="tip-title">Используйте фразы</div>
+                        <div class="tip-description">
+                            Создайте пароль из первых букв любимой фразы или песни. Например: "Я родился в 1990 году в Москве!" → "Яр@1990гвМ!"
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🔒</div>
+                        <div class="tip-title">Менеджер паролей</div>
+                        <div class="tip-description">
+                            Используйте надежные менеджеры паролей (1Password, Bitwarden, KeePass) для хранения и генерации уникальных паролей.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🛡️</div>
+                        <div class="tip-title">2FA аутентификация</div>
+                        <div class="tip-description">
+                            Включите двухфакторную аутентификацию везде, где это возможно. Это добавляет дополнительный уровень защиты.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🔄</div>
+                        <div class="tip-title">Уникальные пароли</div>
+                        <div class="tip-description">
+                            Никогда не используйте один пароль для разных сайтов. Утечка на одном сайте может скомпрометировать все аккаунты.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">📅</div>
+                        <div class="tip-title">Регулярная смена</div>
+                        <div class="tip-description">
+                            Меняйте пароли для критически важных сервисов каждые 3-6 месяцев, особенно для банковских и почтовых аккаунтов.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🚫</div>
+                        <div class="tip-title">Избегайте личного</div>
+                        <div class="tip-description">
+                            Не используйте личную информацию: даты рождения, имена близких, клички питомцев, адреса.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generator Page -->
+        <div id="generatorPage" class="page">
+            <div class="main-card">
+                <h2 style="margin-bottom: 25px;">🎲 Генератор надежных паролей</h2>
+
+                <!-- Generator Mode Tabs -->
+                <div class="generator-mode-tabs">
+                    <div class="generator-mode-tab active" data-mode="password" onclick="switchGeneratorMode('password')">
+                        <span>🔐</span>
+                        <span>Пароль</span>
+                    </div>
+                    <div class="generator-mode-tab" data-mode="passphrase" onclick="switchGeneratorMode('passphrase')">
+                        <span>💬</span>
+                        <span>Парольная фраза</span>
+                    </div>
+                </div>
+
+                <div class="generated-password-container">
+                    <div class="generated-password" id="generatedPassword">
+                        Нажмите "Сгенерировать" для создания пароля
+                    </div>
+                    <div class="generator-buttons">
+                        <button class="btn btn-primary" onclick="generateCustomPassword()">
+                            <span>🎲</span>
+                            <span>Сгенерировать</span>
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyPassword()">
+                            <span>📋</span>
+                            <span>Копировать</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Password Generator Controls -->
+                <div class="generator-controls" id="passwordControls">
+                    <div class="control-group">
+                        <label class="control-label">Длина пароля</label>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="lengthSlider" min="12" max="32" value="16">
+                            <span class="slider-value" id="lengthValue">16</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Наборы символов</label>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="uppercaseCheck" checked>
+                            <label for="uppercaseCheck">Заглавные буквы (A-Z)</label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="lowercaseCheck" checked>
+                            <label for="lowercaseCheck">Строчные буквы (a-z)</label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="numbersCheck" checked>
+                            <label for="numbersCheck">Цифры (0-9)</label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="symbolsCheck" checked>
+                            <label for="symbolsCheck">Символы (!@#$%^&*)</label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="extendedCheck">
+                            <label for="extendedCheck">Расширенные символы ({}[]|;:,.<>?/~`)</label>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Дополнительные опции</label>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="excludeSimilar">
+                            <label for="excludeSimilar">Исключить похожие символы (0O, 1l, I)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passphrase Generator Controls -->
+                <div class="generator-controls" id="passphraseControls" style="display: none;">
+                    <div class="control-group">
+                        <label class="control-label">Количество слов</label>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="wordCountSlider" min="3" max="12" value="4">
+                            <span class="slider-value" id="wordCountValue">4</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Язык слов</label>
+                        <div class="language-selector">
+                            <label class="radio-option">
+                                <input type="radio" name="passphraseLanguage" value="english" checked>
+                                <span>Английский</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="passphraseLanguage" value="russian">
+                                <span>Русский</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="passphraseLanguage" value="mixed">
+                                <span>Смешанный</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Разделитель</label>
+                        <div class="separator-selector">
+                            <button class="separator-option active" data-separator="-" onclick="selectSeparator('-')">
+                                <span class="separator-symbol">-</span>
+                                <span class="separator-name">Дефис</span>
+                            </button>
+                            <button class="separator-option" data-separator=" " onclick="selectSeparator(' ')">
+                                <span class="separator-symbol">␣</span>
+                                <span class="separator-name">Пробел</span>
+                            </button>
+                            <button class="separator-option" data-separator="_" onclick="selectSeparator('_')">
+                                <span class="separator-symbol">_</span>
+                                <span class="separator-name">Подчеркивание</span>
+                            </button>
+                            <button class="separator-option" data-separator="." onclick="selectSeparator('.')">
+                                <span class="separator-symbol">.</span>
+                                <span class="separator-name">Точка</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Дополнительные опции</label>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="capitalizeCheck" checked>
+                            <label for="capitalizeCheck">Капитализация первой буквы каждого слова</label>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="addNumbersCheck" checked>
+                            <label for="addNumbersCheck">Добавить цифру</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entropy Info for Password -->
+                <div class="entropy-info" id="passwordEntropyInfo">
+                    <div class="entropy-stat">
+                        <div class="entropy-value" id="genStrength">Слабый</div>
+                        <div class="entropy-label">Уровень надежности</div>
+                    </div>
+                    <div class="entropy-stat">
+                        <div class="entropy-value" id="genEntropyBits">0</div>
+                        <div class="entropy-label">Бит энтропии</div>
+                    </div>
+                    <div class="entropy-stat">
+                        <div class="entropy-value" id="genCrackTime">—</div>
+                        <div class="entropy-label">Время взлома</div>
+                    </div>
+                </div>
+
+                <!-- Memorability Hint for Passphrase -->
+                <div class="memorability-hint" id="passphraseMemorabilityInfo" style="display: none;">
+                    <div class="memorability-icon">🧠</div>
+                    <div class="memorability-content">
+                        <div class="memorability-title">О запоминаемости парольных фраз</div>
+                        <div class="memorability-text">
+                            <p><strong>Легче запомнить:</strong> Парольные фразы состоят из обычных слов, которые наш мозг легко запоминает.</p>
+                            <p><strong>Высокая безопасность:</strong> 4-5 случайных слов обеспечивают очень высокий уровень защиты.</p>
+                            <p><strong>Примеры фраз:</strong></p>
+                            <ul>
+                                <li>correct-horse-battery-staple</li>
+                                <li>Синий_Кот_Прыгает_Весело</li>
+                                <li>quick.собака.dance.солнце</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tips-section">
+                <h2>📖 Как использовать генератор</h2>
+
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon">📏</div>
+                        <div class="tip-title">Оптимальная длина</div>
+                        <div class="tip-description">
+                            Для большинства случаев достаточно 16 символов. Для критически важных аккаунтов используйте 20+ символов.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🎯</div>
+                        <div class="tip-title">Баланс безопасности</div>
+                        <div class="tip-description">
+                            Используйте все типы символов для максимальной энтропии. Каждый дополнительный набор значительно усложняет взлом.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">💾</div>
+                        <div class="tip-title">Сохранение паролей</div>
+                        <div class="tip-description">
+                            Никогда не сохраняйте пароли в текстовых файлах или браузере. Используйте специальные менеджеры паролей.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hasher Page -->
+        <div id="hasherPage" class="page">
+            <div class="main-card">
+                <h2 style="margin-bottom: 25px;">🔑 Шифратор паролей</h2>
+
+                <div class="hasher-input-container">
+                    <textarea
+                        id="hasherInput"
+                        class="hasher-textarea"
+                        placeholder="Введите текст или пароль для хеширования..."
+                        autocomplete="off"
+                    ></textarea>
+                </div>
+
+                <div class="hash-algorithms">
+                    <button class="algorithm-btn" onclick="hashSingleAlgorithm('MD5', true)">
+                        <span>📝</span> MD5
+                    </button>
+                    <button class="algorithm-btn" onclick="hashSingleAlgorithm('SHA-1', true)">
+                        <span>🔒</span> SHA-1
+                    </button>
+                    <button class="algorithm-btn" onclick="hashSingleAlgorithm('SHA-256', true)">
+                        <span>🔐</span> SHA-256
+                    </button>
+                    <button class="algorithm-btn" onclick="hashSingleAlgorithm('SHA-512', true)">
+                        <span>⚡</span> SHA-512
+                    </button>
+                </div>
+
+                <div class="hash-format-selector">
+                    <label class="format-label">Формат вывода:</label>
+                    <div class="format-options">
+                        <button class="format-option active" data-format="hex" onclick="setHashFormat('hex')">HEX</button>
+                        <button class="format-option" data-format="base64" onclick="setHashFormat('base64')">Base64</button>
+                        <button class="format-option" data-format="uppercase" onclick="setHashFormat('uppercase')">UPPERCASE</button>
+                    </div>
+                </div>
+
+                <div class="hash-result-container" id="hashResultContainer" style="display: none;">
+                    <div class="hash-result-header">
+                        <span class="hash-algorithm-label" id="currentAlgorithm">
+                            <span id="algorithmIcon">🔐</span>
+                            <span id="algorithmName">SHA-256</span>
+                        </span>
+                        <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.9rem;" onclick="clearHasher()">
+                            <span>🗑️</span>
+                            <span>Очистить</span>
+                        </button>
+                    </div>
+                    <div class="hash-output-single" id="hashOutput" onclick="copyHashValue()">
+                        <span id="hashValue"></span>
+                        <button class="hash-copy-btn-single" onclick="event.stopPropagation(); copyHashValue()">
+                            📋 Копировать
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hash-info">
+                    <div class="hash-info-title">ℹ️ О хешировании</div>
+                    <div class="hash-info-content">
+                        <p>Хеширование - это односторонняя функция преобразования данных в уникальную строку фиксированной длины.</p>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li><strong>MD5</strong> - 128 бит (устарел, не рекомендуется для безопасности)</li>
+                            <li><strong>SHA-1</strong> - 160 бит (устарел, не рекомендуется)</li>
+                            <li><strong>SHA-256</strong> - 256 бит (рекомендуется, широко используется)</li>
+                            <li><strong>SHA-512</strong> - 512 бит (высокая безопасность)</li>
+                        </ul>
+                        <p style="margin-top: 10px; color: var(--accent-yellow);">⚠️ Хеши не являются шифрованием и не могут быть декодированы обратно!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tips-section">
+                <h2>🔐 Применение хеширования</h2>
+
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon">🔍</div>
+                        <div class="tip-title">Проверка целостности</div>
+                        <div class="tip-description">
+                            Хеши используются для проверки целостности файлов. Любое изменение файла приводит к полностью другому хешу.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🗄️</div>
+                        <div class="tip-title">Хранение паролей</div>
+                        <div class="tip-description">
+                            Сервисы хранят хеши паролей, а не сами пароли. При входе ваш пароль хешируется и сравнивается с сохраненным хешем.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🔐</div>
+                        <div class="tip-title">Цифровые подписи</div>
+                        <div class="tip-description">
+                            Хеши являются основой для создания цифровых подписей и проверки подлинности документов.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">⚠️</div>
+                        <div class="tip-title">Не используйте MD5</div>
+                        <div class="tip-description">
+                            MD5 и SHA-1 считаются устаревшими и уязвимыми. Для критически важных задач используйте SHA-256 или выше.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🔄</div>
+                        <div class="tip-title">Соль для паролей</div>
+                        <div class="tip-description">
+                            При хешировании паролей всегда используйте "соль" - случайные данные, добавляемые к паролю перед хешированием.
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <div class="tip-icon">🎲</div>
+                        <div class="tip-title">Уникальность хешей</div>
+                        <div class="tip-description">
+                            Вероятность коллизии (двух разных входов с одинаковым хешем) крайне мала для современных алгоритмов.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="copy-notification" id="copyNotification">
+        ✅ Скопировано в буфер обмена!
+    </div>
+
+    <script src="js/wordlists.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
