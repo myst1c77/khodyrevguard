@@ -32,7 +32,7 @@
         // Конфигурация HIBP проверки с fallback endpoints
         const HIBP_CONFIG = {
             endpoints: [
-                { name: 'deno', url: (p) => `https://noisy-dodo-86.myst1c77.deno.net?prefix=${p}`, timeout: 4000 },
+                { name: 'deno', url: (p) => `https://noisy-dodo-86-3070w9wty3ry.myst1c77.deno.net?prefix=${p}`, timeout: 4000 },
                 { name: 'direct', url: (p) => `https://api.pwnedpasswords.com/range/${p}`, timeout: 3000 }
             ],
             lastSuccessfulMethod: null
