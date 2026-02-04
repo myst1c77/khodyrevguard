@@ -6,14 +6,13 @@
         function switchTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
-            
+
             // Update active button
             document.querySelectorAll('.theme-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             document.querySelector(`.theme-btn[data-theme="${theme}"]`).classList.add('active');
         }
-
 
         const AppState = {
             debounceTimer: null,
@@ -27,7 +26,6 @@
             currentHashAlgorithm: null,
             currentHashValue: '',
             lastAnalysisResults: null, // Хранилище результатов последнего анализа для экспорта
-            pwnedAbortController: null, // AbortController для отмены HIBP запросов
             pwnedCache: new Map() // Кэш для HIBP проверок (SHA-1 hash -> breach count)
         };
 
@@ -335,11 +333,6 @@
             const statusEl = document.getElementById('pwnedStatus');
             const textEl = document.getElementById('pwnedText');
 
-            // Cancel any pending request
-            if (AppState.pwnedAbortController) {
-                AppState.pwnedAbortController.abort();
-            }
-
             // Show checking status
             statusEl.className = 'pwned-status checking show';
             textEl.textContent = '🔍 Проверяем пароль в базе утечек...';
@@ -357,7 +350,7 @@
                     const cachedCount = AppState.pwnedCache.get(hashHex);
                     if (cachedCount > 0) {
                         statusEl.className = 'pwned-status compromised show';
-                        textEl.textContent = `Этот пароль был найден в ${cachedCount.toLocaleString()} утечках данных! Срочно смените его!`;
+                        textEl.textContent = `⚠️ Пароль найден в ${cachedCount.toLocaleString()} утечках данных! Срочно смените его!`;
                     } else {
                         statusEl.className = 'pwned-status safe show';
                         textEl.textContent = '✅ Пароль не найден в базах утечек';
@@ -368,59 +361,81 @@
                 const prefix = hashHex.substring(0, 5).toUpperCase();
                 const suffix = hashHex.substring(5).toUpperCase();
 
-                // Create new AbortController for this request
-                AppState.pwnedAbortController = new AbortController();
+                // Стратегия: сначала прямое подключение, при неудаче - прокси
+                const requestStrategy = ['direct', 'proxy'];
+                const proxyBaseUrl = 'https://hibp-proxy.gruzzliifn.workers.dev';
 
-                // Try to fetch from API
-                try {
-                    const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, {
-                        mode: 'cors',
-                        headers: {
-                            'User-Agent': 'KhodyrevGuard-Password-Analyzer'
-                        },
-                        signal: AppState.pwnedAbortController.signal
-                    });
+                // Пытаемся выполнить запросы по стратегии
+                for (let i = 0; i < requestStrategy.length; i++) {
+                    const method = requestStrategy[i];
 
-                    if (response.ok) {
-                        const text = await response.text();
-                        const lines = text.split('\n');
+                    try {
+                        let response;
+                        let url;
 
-                        for (const line of lines) {
-                            const [hashSuffix, count] = line.split(':');
-                            if (hashSuffix === suffix) {
-                                const breachCount = parseInt(count);
-                                // Cache the result
-                                AppState.pwnedCache.set(hashHex, breachCount);
-                                statusEl.className = 'pwned-status compromised show';
-                                textEl.textContent = `Этот пароль был найден в ${breachCount.toLocaleString()} утечках данных! Срочно смените его!`;
-                                return breachCount;
-                            }
+                        if (method === 'proxy') {
+                            // Запрос через прокси
+                            url = `${proxyBaseUrl}?prefix=${prefix}`;
+                        } else {
+                            // Прямой запрос к HIBP API
+                            url = `https://api.pwnedpasswords.com/range/${prefix}`;
                         }
 
-                        // Password not found - cache result
-                        AppState.pwnedCache.set(hashHex, 0);
-                        statusEl.className = 'pwned-status safe show';
-                        textEl.textContent = '✅ Пароль не найден в базах утечек';
-                        return 0;
-                    }
-                } catch (networkError) {
-                    // Check if request was aborted (user is typing)
-                    if (networkError.name === 'AbortError') {
-                        console.log('HIBP запрос отменён (пользователь продолжает ввод)');
-                        return -1;
-                    }
+                        response = await fetch(url, {
+                            mode: 'cors',
+                            headers: {
+                                'User-Agent': 'KhodyrevGuard-Password-Analyzer'
+                            }
+                        });
 
-                    // CORS or network error - use fallback method
-                    console.log('HIBP API недоступен:', networkError);
+                        if (response.ok) {
+                            const text = await response.text();
+                            const lines = text.split('\n');
 
-                    statusEl.className = 'pwned-status show';
-                    textEl.textContent = '⚠️ Проверка недоступна (требуется подключение к интернету)';
-                    return 0;
+                            for (const line of lines) {
+                                const [hashSuffix, count] = line.split(':');
+                                if (hashSuffix === suffix) {
+                                    const breachCount = parseInt(count);
+                                    // Cache the result
+                                    AppState.pwnedCache.set(hashHex, breachCount);
+                                    statusEl.className = 'pwned-status compromised show';
+                                    textEl.textContent = `⚠️ Пароль найден в ${breachCount.toLocaleString()} утечках данных! Срочно смените его!`;
+                                    return breachCount;
+                                }
+                            }
+
+                            // Password not found - cache result
+                            AppState.pwnedCache.set(hashHex, 0);
+                            statusEl.className = 'pwned-status safe show';
+                            textEl.textContent = '✅ Пароль не найден в базах утечек';
+                            return 0;
+                        }
+
+                        // Если ответ не OK, пробуем следующий метод
+                        console.log(`HIBP ${method} запрос вернул статус ${response.status}`);
+
+                    } catch (networkError) {
+                        console.log(`HIBP ${method} запрос не удался:`, networkError.message);
+
+                        // Если это последний метод в стратегии, покажем ошибку
+                        if (i === requestStrategy.length - 1) {
+                            throw networkError;
+                        }
+                        // Иначе пробуем следующий метод
+                    }
                 }
+
+                // Если все методы не сработали
+                throw new Error('Все методы подключения к HIBP API не удались');
+
             } catch (error) {
                 console.error('Ошибка при проверке пароля:', error);
-                statusEl.className = 'pwned-status';
-                return -1;
+
+                // Показываем информативное сообщение об ошибке
+                statusEl.className = 'pwned-status show';
+                textEl.textContent = '⚠️ Сервис проверки утечек временно недоступен';
+
+                return 0;
             }
         }
 
@@ -2087,7 +2102,7 @@
         // Initialize generator on first load
         document.addEventListener('DOMContentLoaded', () => {
             // generateCustomPassword(); // Убрана автогенерация при загрузке страницы
-            
+
             // Initialize hasher event listeners
             const hasherInput = document.getElementById('hasherInput');
             if (hasherInput) {
