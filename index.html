@@ -55,7 +55,7 @@
             </button>
             <button type="button" class="nav-tab" role="tab" aria-selected="false" aria-controls="hasherPage" onclick="switchPage('hasher', event)">
                 <i data-lucide="key-round"></i>
-                <span>Шифратор</span>
+                <span>Хеш-генератор</span>
             </button>
         </nav>
 
@@ -240,7 +240,7 @@
                     <div class="entropy-stat">
                         <div class="entropy-value" id="entropyBits">0</div>
                         <div class="entropy-label">
-                            Бит энтропии
+                            Энтропия Шеннона
                             <span class="entropy-info-icon" onclick="toggleEntropyTooltip()" title="Как рассчитывается энтропия?"><i data-lucide="info"></i></span>
                         </div>
                     </div>
@@ -413,6 +413,10 @@
                             <i data-lucide="clipboard"></i>
                             <span>Копировать</span>
                         </button>
+                        <button class="btn btn-analyze" id="analyzeBtn" onclick="analyzeGeneratedPassword()">
+                            <i data-lucide="shield-check"></i>
+                            <span>Проанализировать</span>
+                        </button>
                     </div>
                 </div>
 
@@ -529,12 +533,12 @@
                 <!-- Entropy Info for Password -->
                 <div class="entropy-info" id="passwordEntropyInfo">
                     <div class="entropy-stat">
-                        <div class="entropy-value" id="genStrength">Слабый</div>
-                        <div class="entropy-label"><i data-lucide="shield-half"></i> Уровень надежности</div>
+                        <div class="entropy-value" id="genStrength">—</div>
+                        <div class="entropy-label"><i data-lucide="gauge"></i> Оценка надёжности</div>
                     </div>
                     <div class="entropy-stat">
-                        <div class="entropy-value" id="genEntropyBits">0</div>
-                        <div class="entropy-label"><i data-lucide="activity"></i> Бит энтропии</div>
+                        <div class="entropy-value gen-hibp-value" id="genHibpResult">—</div>
+                        <div class="entropy-label"><i data-lucide="shield-alert"></i> Утечки</div>
                     </div>
                     <div class="entropy-stat">
                         <div class="entropy-value" id="genCrackTime">—</div>
@@ -593,7 +597,7 @@
         <!-- Hasher Page -->
         <div id="hasherPage" class="page">
             <div class="main-card">
-                <h2 class="page-title"><i data-lucide="key-round"></i> Шифратор паролей</h2>
+                <h2 class="page-title"><i data-lucide="key-round"></i> Хеш-генератор</h2>
 
                 <div class="hasher-input-container">
                     <textarea
@@ -725,7 +729,7 @@
 
     <script src="js/wordlists.js"></script>
     <script src="js/app.js"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.576.0/dist/umd/lucide.min.js" integrity="sha384-b05ba3pt6xaC7F4r130arhf8cF18GH/gKu9JDz/NMf+BhLlBVwIWUdAZSpf1IWRZ" crossorigin="anonymous"></script>
     <script>lucide.createIcons();</script>
 </body>
 </html>
