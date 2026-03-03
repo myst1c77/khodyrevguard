@@ -1,11 +1,15 @@
         // Theme switcher
-        let currentTheme = localStorage.getItem('theme') || 'original';
+        const THEME_COLORS = { light: '#f8f9fa', dark: '#0d0d0d', original: '#0a0e27', blue: '#0a1929' };
+
+        let currentTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', currentTheme);
         document.querySelector(`.theme-btn[data-theme="${currentTheme}"]`).classList.add('active');
+        document.getElementById('themeColorMeta').setAttribute('content', THEME_COLORS[currentTheme] || '#f8f9fa');
 
         function switchTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
+            document.getElementById('themeColorMeta').setAttribute('content', THEME_COLORS[theme] || '#f8f9fa');
 
             // Update active button
             document.querySelectorAll('.theme-btn').forEach(btn => {
@@ -28,6 +32,14 @@
             lastAnalysisResults: null, // Хранилище результатов последнего анализа для экспорта
             pwnedCache: new Map() // Кэш для HIBP проверок (SHA-1 hash -> breach count)
         };
+
+        // Восстанавливаем HIBP-кэш из sessionStorage (живёт до закрытия вкладки)
+        (function() {
+            try {
+                const stored = sessionStorage.getItem('hibpCache');
+                if (stored) AppState.pwnedCache = new Map(Object.entries(JSON.parse(stored)));
+            } catch(e) {}
+        })();
 
         // Конфигурация HIBP проверки с fallback endpoints
         const HIBP_CONFIG = {
@@ -71,14 +83,15 @@
         function displayPwnedResult(statusEl, textEl, count) {
             if (count > 0) {
                 statusEl.className = 'pwned-status compromised show';
-                textEl.textContent = `⚠️ Пароль найден в ${count.toLocaleString()} утечках данных! Срочно смените его!`;
+                textEl.innerHTML = `<span class="criterion-icon"><i data-lucide="triangle-alert"></i></span><span>Пароль найден в ${count.toLocaleString()} утечках данных! Срочно смените его!</span>`;
             } else if (count === 0) {
                 statusEl.className = 'pwned-status safe show';
-                textEl.textContent = '✅ Пароль не найден в базах утечек';
+                textEl.innerHTML = '<span class="criterion-icon"><i data-lucide="shield-check"></i></span><span>Пароль не найден в базах утечек</span>';
             } else {
                 statusEl.className = 'pwned-status warning show';
-                textEl.textContent = '⚠️ Не удалось проверить пароль в базе утечек';
+                textEl.innerHTML = '<span class="criterion-icon"><i data-lucide="circle-alert"></i></span><span>Не удалось проверить пароль в базе утечек</span>';
             }
+            if (window.lucide) lucide.createIcons();
         }
 
         // Запрет копирования и контекстного меню на всём сайте, кроме поля ввода пароля
@@ -113,17 +126,33 @@
 
         // Page switching
         function switchPage(page, event) {
+            const currentPageEl = document.querySelector('.page.active');
+            if (currentPageEl && currentPageEl.id === page + 'Page') return;
+
             AppState.currentPage = page;
 
-            // Update tabs
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            // Update tabs immediately
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-selected', 'false');
+            });
             if (event && event.target) {
-                event.target.closest('.nav-tab').classList.add('active');
+                const activeTab = event.target.closest('.nav-tab');
+                activeTab.classList.add('active');
+                activeTab.setAttribute('aria-selected', 'true');
             }
 
-            // Update pages
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(page + 'Page').classList.add('active');
+            // Fade out current page, then switch
+            if (currentPageEl) {
+                currentPageEl.classList.add('page-exit');
+                setTimeout(() => {
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active', 'page-exit'));
+                    document.getElementById(page + 'Page').classList.add('active');
+                }, 180);
+            } else {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(page + 'Page').classList.add('active');
+            }
         }
 
         // Password visibility toggle
@@ -133,26 +162,27 @@
             
             if (AppState.isPasswordVisible) {
                 input.type = 'password';
-                btn.textContent = '👁️';
+                btn.innerHTML = '<i data-lucide="eye"></i>';
             } else {
                 input.type = 'text';
-                btn.textContent = '👁️‍🗨️';
+                btn.innerHTML = '<i data-lucide="eye-off"></i>';
             }
             AppState.isPasswordVisible = !AppState.isPasswordVisible;
+            if (window.lucide) lucide.createIcons();
         }
 
         // MD5 implementation (RFC 1321 compliant)
         function md5(string) {
             // Convert string to UTF-8 bytes
-            const utf8Bytes = unescape(encodeURIComponent(string));
-            const msgLength = utf8Bytes.length;
+            const utf8Array = new TextEncoder().encode(string);
+            const msgLength = utf8Array.length;
             const blockCount = ((msgLength + 8) >>> 6) + 1;
             const blocks = new Array(blockCount * 16);
 
             // Convert message to 32-bit words
             let i;
             for (i = 0; i < msgLength; i++) {
-                blocks[i >>> 2] |= utf8Bytes.charCodeAt(i) << ((i % 4) << 3);
+                blocks[i >>> 2] |= utf8Array[i] << ((i % 4) << 3);
             }
 
             // Append padding
@@ -285,21 +315,21 @@
             }
         }
 
-        async function hashSingleAlgorithm(algorithm, isUserClick = true) {
+        async function hashSingleAlgorithm(algorithm, isUserClick = true, ev = null) {
             const input = document.getElementById('hasherInput').value;
             if (!input) {
-                alert('Пожалуйста, введите текст для хеширования');
+                showNotification('⚠️ Введите текст для хеширования');
                 return;
             }
-            
+
             // Update active button only if it's a user click
             if (isUserClick) {
                 document.querySelectorAll('.algorithm-btn').forEach(btn => {
                     btn.classList.remove('active');
                 });
-                
+
                 // Find and activate the clicked button
-                const clickedBtn = event?.target?.closest('.algorithm-btn');
+                const clickedBtn = ev?.target?.closest('.algorithm-btn');
                 if (clickedBtn) {
                     clickedBtn.classList.add('active');
                 } else {
@@ -325,7 +355,8 @@
             const hashValue = document.getElementById('hashValue');
             
             // Update algorithm info
-            algorithmIcon.textContent = getAlgorithmIcon(algorithm);
+            algorithmIcon.innerHTML = getAlgorithmIcon(algorithm);
+            if (window.lucide) lucide.createIcons();
             algorithmName.textContent = algorithm;
             hashValue.textContent = hash;
             
@@ -335,12 +366,12 @@
 
         function getAlgorithmIcon(algorithm) {
             const icons = {
-                'MD5': '📝',
-                'SHA-1': '🔒',
-                'SHA-256': '🔐',
-                'SHA-512': '⚡'
+                'MD5': 'code-2',
+                'SHA-1': 'lock',
+                'SHA-256': 'shield-check',
+                'SHA-512': 'zap'
             };
-            return icons[algorithm] || '🔑';
+            return `<i data-lucide="${icons[algorithm] || 'key-round'}"></i>`;
         }
 
         function copyHashValue() {
@@ -349,7 +380,7 @@
             navigator.clipboard.writeText(AppState.currentHashValue).then(() => {
                 showNotification('✅ Хеш скопирован в буфер обмена!');
             }).catch(err => {
-                alert('Не удалось скопировать хеш');
+                showNotification('⚠️ Не удалось скопировать хеш');
             });
         }
 
@@ -387,7 +418,7 @@
 
             // Show checking status
             statusEl.className = 'pwned-status checking show';
-            textEl.textContent = '🔍 Проверяем пароль в базе утечек...';
+            textEl.textContent = 'Проверяем пароль в базе утечек...';
 
             try {
                 // SHA-1 hash
@@ -421,8 +452,6 @@
                 for (let i = 0; i < endpoints.length; i++) {
                     const endpoint = endpoints[i];
                     try {
-                        console.log(`HIBP: пробуем ${endpoint.name}...`);
-
                         const response = await fetchWithTimeout(endpoint.url(prefix), {
                             mode: 'cors',
                             headers: { 'User-Agent': 'KhodyrevGuard-Password-Analyzer' }
@@ -434,15 +463,14 @@
 
                             // Кэшируем результат
                             AppState.pwnedCache.set(hashHex, breachCount);
+                            try { sessionStorage.setItem('hibpCache', JSON.stringify(Object.fromEntries(AppState.pwnedCache))); } catch(e) {}
                             // Запоминаем успешный метод
                             HIBP_CONFIG.lastSuccessfulMethod = endpoint.name;
 
                             displayPwnedResult(statusEl, textEl, breachCount);
                             return breachCount;
                         }
-                        console.log(`HIBP ${endpoint.name}: статус ${response.status}`);
                     } catch (error) {
-                        console.log(`HIBP ${endpoint.name}: ${error.message}`);
                         // Если это последний метод, выбрасываем ошибку
                         if (i === endpoints.length - 1) throw error;
                     }
@@ -455,7 +483,8 @@
                 console.error('HIBP ошибка:', error);
                 // Graceful degradation - показываем предупреждение и продолжаем
                 statusEl.className = 'pwned-status warning show';
-                textEl.textContent = '⚠️ Проверка утечек недоступна. Анализ выполнен без этой проверки.';
+                textEl.innerHTML = '<i data-lucide="circle-alert"></i> Проверка утечек недоступна. Анализ выполнен без этой проверки.';
+                if (window.lucide) lucide.createIcons();
                 return -1;
             }
         }
@@ -527,12 +556,14 @@
         function formatCrackTime(seconds) {
             let timeText = '';
             let emoji = '';
+            let iconName = '';
             let color = '';
 
             // 1. СЕКУНДЫ (с 2 десятичными знаками)
             if (seconds < 60) {
                 timeText = `${seconds.toFixed(2)} секунд`;
                 emoji = seconds < 1 ? '⚡' : '⏱️';
+                iconName = seconds < 1 ? 'zap' : 'timer';
                 color = 'var(--accent-red)';
             }
             // 2. МИНУТЫ (с десятичными знаками - умное округление)
@@ -549,24 +580,28 @@
                     timeText = `${parseFloat(formatted)} минут`;
                 }
                 emoji = '⏰';
+                iconName = 'alarm-clock';
                 color = 'var(--accent-red)';
             }
             // 3. ЧАСЫ (целые числа)
             else if (seconds < 86400) {
                 timeText = `${Math.round(seconds / 3600)} часов`;
                 emoji = '🕐';
+                iconName = 'clock';
                 color = '#ff6b6b';
             }
             // 4. ДНИ (целые числа)
             else if (seconds < 2592000) {  // < 30 дней
                 timeText = `${Math.round(seconds / 86400)} дней`;
                 emoji = '📅';
+                iconName = 'calendar';
                 color = '#ffa94d';
             }
             // 5. МЕСЯЦЫ (целые числа)
             else if (seconds < 31536000) {  // < 1 года
                 timeText = `${Math.round(seconds / 2592000)} месяцев`;
                 emoji = '📆';
+                iconName = 'calendar-days';
                 color = 'var(--accent-yellow)';
             }
             // 6. ГОДЫ (целые числа)
@@ -574,6 +609,7 @@
                 const years = Math.round(seconds / 31536000);
                 timeText = `${years} лет`;
                 emoji = years < 10 ? '🗓️' : '📊';
+                iconName = years < 10 ? 'calendar-range' : 'bar-chart-2';
                 color = '#51cf66';
             }
             // 7. ТЫСЯЧИ ЛЕТ (целые числа)
@@ -581,6 +617,7 @@
                 const thousands = Math.round(seconds / 31536000000);
                 timeText = `${thousands} тыс. лет`;
                 emoji = '🌍';
+                iconName = 'globe';
                 color = '#339af0';
             }
             // 8. МИЛЛИОНЫ ЛЕТ (целые числа)
@@ -588,6 +625,7 @@
                 const millions = Math.round(seconds / 31536000000000);
                 timeText = `${millions} млн. лет`;
                 emoji = '🦖';
+                iconName = 'hourglass';
                 color = '#845ef7';
             }
             // 9. МИЛЛИАРДЫ ЛЕТ И ВЫШЕ
@@ -598,12 +636,14 @@
                 if (years >= 1e9) {
                     timeText = 'вечность';
                     emoji = '♾️';
+                    iconName = 'infinity';
                     color = '#e64980';
                 } else {
                     // Миллиарды лет (но меньше 1 миллиарда)
                     const billions = Math.round(years / 1e9);
                     timeText = `${billions} млрд. лет`;
                     emoji = '💫';
+                    iconName = 'infinity';
                     color = '#e64980';
                 }
             }
@@ -612,7 +652,8 @@
             const element = document.getElementById('crackTime');
             if (element) {
                 element.style.color = color;
-                element.innerHTML = `${emoji} ${timeText}`;
+                element.innerHTML = `<i data-lucide="${iconName}"></i> ${timeText}`;
+                if (window.lucide) lucide.createIcons();
             }
 
             // Return structured data for export
@@ -1247,7 +1288,7 @@
             const finalScore = Math.round(entropy) + (4 * analysis.criteriaCount);
 
             // Update strength meter
-            const strengthMeter = document.getElementById('strengthMeter');
+            const strengthSegments = document.getElementById('strengthSegments');
             const strengthText = document.getElementById('strengthText');
             const strengthScore = document.getElementById('strengthScore');
 
@@ -1294,54 +1335,39 @@
             let strengthLevel, strengthClass, color;
 
             if (displayScore < 40) {
-                strengthLevel = '⚠️ Слабый пароль';
+                strengthLevel = 'Слабый пароль';
                 strengthClass = 'weak';
                 color = 'var(--accent-red)';
             } else if (displayScore < 70) {
-                strengthLevel = '⚡ Средний пароль';
+                strengthLevel = 'Средний пароль';
                 strengthClass = 'medium';
                 color = 'var(--accent-yellow)';
             } else if (displayScore < 90) {
-                strengthLevel = '✅ Сильный пароль';
+                strengthLevel = 'Сильный пароль';
                 strengthClass = 'strong';
                 color = 'var(--accent-green)';
             } else {
-                strengthLevel = '🛡️ Очень сильный пароль';
+                strengthLevel = 'Очень сильный пароль';
                 strengthClass = 'very-strong';
                 color = 'var(--accent-blue)';
             }
 
             // Special message for critical compromise
             if (pwnedSeverity === 'critical') {
-                strengthLevel = '⚠️ Скомпрометированный пароль';
+                strengthLevel = 'Скомпрометированный пароль';
             }
 
             // Update UI with display score (limited to 100)
-            strengthMeter.style.width = `${displayScore}%`;
             strengthScore.textContent = `${displayScore}/100`;
             strengthText.textContent = strengthLevel;
-            strengthMeter.className = 'strength-meter-fill ' + strengthClass;
-            strengthMeter.style.background = color;
 
-            // Используем количество выполненных критериев из analyzePassword
-            const fulfilledCount = analysis.criteriaCount;
-
-            // Update indicators based on count
-            const indicators = document.querySelectorAll('.strength-indicator');
-            indicators.forEach((indicator, index) => {
-                // Remove all classes
-                indicator.classList.remove('active', 'weak', 'medium', 'strong', 'very-strong');
-
-                // If password is critically compromised (>= 1M leaks), all indicators stay inactive
-                if (pwnedSeverity === 'critical') {
-                    // Do nothing - all indicators remain inactive
-                } else {
-                    // Light up indicator if its index is less than fulfilled count
-                    if (index < fulfilledCount) {
-                        indicator.classList.add('active', strengthClass);
-                    }
-                }
-            });
+            // Update 5-segment strength bar
+            if (pwnedSeverity === 'critical') {
+                strengthSegments.dataset.active = '0';
+            } else {
+                const activeCount = displayScore > 0 ? Math.max(1, Math.ceil(displayScore / 20)) : 0;
+                strengthSegments.dataset.active = String(activeCount);
+            }
 
             document.getElementById('timeToCrack').style.display = 'block';
             document.getElementById('entropyInfo').style.display = 'flex';
@@ -1353,7 +1379,8 @@
                 const element = document.getElementById('crackTime');
                 if (element) {
                     element.style.color = 'var(--accent-red)';
-                    element.innerHTML = '⚡ Мгновенно';
+                    element.innerHTML = '<i data-lucide="zap"></i> Мгновенно';
+                    if (window.lucide) lucide.createIcons();
                 }
                 crackTimeData = { text: 'Мгновенно', emoji: '⚡', color: 'var(--accent-red)', seconds: 0, formatted: '⚡ Мгновенно' };
             } else {
@@ -1405,20 +1432,16 @@
             });
 
             // Reset enhanced visualization
-            document.getElementById('strengthMeter').style.width = '0%';
-            document.getElementById('strengthMeter').className = 'strength-meter-fill';
+            document.getElementById('strengthSegments').dataset.active = '0';
             document.getElementById('strengthText').textContent = 'Введите пароль';
             document.getElementById('strengthScore').textContent = '0/100';
-            document.getElementById('strengthIcon').textContent = '🔒';
+            document.getElementById('strengthIcon').innerHTML = '<i data-lucide="shield"></i>';
             document.getElementById('strengthIcon').className = 'strength-icon';
+            if (window.lucide) lucide.createIcons();
             document.getElementById('strengthBadge').style.display = 'none';
             document.getElementById('strengthDetails').style.display = 'none';
             document.getElementById('strengthFeedback').style.display = 'none';
 
-            // Reset indicators
-            document.querySelectorAll('.strength-indicator').forEach(indicator => {
-                indicator.classList.remove('active', 'weak', 'medium', 'strong', 'very-strong');
-            });
 
             document.getElementById('timeToCrack').style.display = 'none';
             document.getElementById('entropyInfo').style.display = 'none';
@@ -1555,7 +1578,7 @@
             const charset = getCharsets();
 
             if (charset.length === 0) {
-                alert('Выберите хотя бы один набор символов!');
+                showNotification('⚠️ Выберите хотя бы один набор символов!');
                 return;
             }
 
@@ -1585,16 +1608,16 @@
             // Определить уровень надежности (пороги 40/70/90)
             let strength, strengthColor;
             if (displayScore < 40) {
-                strength = '⚠️ Слабый';
+                strength = 'Слабый';
                 strengthColor = 'var(--accent-red)';
             } else if (displayScore < 70) {
-                strength = '⚡ Средний';
+                strength = 'Средний';
                 strengthColor = 'var(--accent-yellow)';
             } else if (displayScore < 90) {
-                strength = '✅ Сильный';
+                strength = 'Сильный';
                 strengthColor = 'var(--accent-green)';
             } else {
-                strength = '🛡️ Очень сильный';
+                strength = 'Очень сильный';
                 strengthColor = 'var(--accent-blue)';
             }
 
@@ -1604,79 +1627,88 @@
             
             // Format crack time with visual variety (matching analyzer page)
             let timeText = '';
-            let emoji = '';
+            let iconName = '';
             let timeColor = '';
-            
+
             if (secondsToCrack < 1) {
                 timeText = 'Мгновенно';
-                emoji = '⚡';
+                iconName = 'zap';
                 timeColor = 'var(--accent-red)';
             } else if (secondsToCrack < 60) {
                 timeText = `${Math.round(secondsToCrack)} секунд`;
-                emoji = '⏱️';
+                iconName = 'timer';
                 timeColor = 'var(--accent-red)';
             } else if (secondsToCrack < 3600) {
                 timeText = `${Math.round(secondsToCrack / 60)} минут`;
-                emoji = '⏰';
+                iconName = 'alarm-clock';
                 timeColor = 'var(--accent-red)';
             } else if (secondsToCrack < 86400) {
                 timeText = `${Math.round(secondsToCrack / 3600)} часов`;
-                emoji = '🕐';
+                iconName = 'clock';
                 timeColor = '#ff6b6b';
             } else if (secondsToCrack < 2592000) {
                 timeText = `${Math.round(secondsToCrack / 86400)} дней`;
-                emoji = '📅';
+                iconName = 'calendar';
                 timeColor = '#ffa94d';
             } else if (secondsToCrack < 31536000) {
                 timeText = `${Math.round(secondsToCrack / 2592000)} месяцев`;
-                emoji = '📆';
+                iconName = 'calendar-days';
                 timeColor = 'var(--accent-yellow)';
             } else if (secondsToCrack < 315360000) {
                 timeText = `${Math.round(secondsToCrack / 31536000)} лет`;
-                emoji = '🗓️';
+                iconName = 'calendar-range';
                 timeColor = '#51cf66';
             } else if (secondsToCrack < 31536000000) {
                 const years = Math.round(secondsToCrack / 31536000);
                 if (years < 100) {
                     timeText = `${years} лет`;
-                    emoji = '📊';
+                    iconName = 'bar-chart-2';
                 } else if (years < 1000) {
                     timeText = `${Math.round(years / 10) * 10} лет`;
-                    emoji = '⌛';
+                    iconName = 'hourglass';
                 } else {
                     timeText = `${Math.round(years / 100) / 10} тыс. лет`;
-                    emoji = '🏛️';
+                    iconName = 'landmark';
                 }
                 timeColor = 'var(--accent-green)';
             } else if (secondsToCrack < 31536000000000) {
                 timeText = `${Math.round(secondsToCrack / 31536000000)} тыс. лет`;
-                emoji = '🌍';
+                iconName = 'globe';
                 timeColor = '#339af0';
             } else if (secondsToCrack < 31536000000000000) {
                 timeText = `${Math.round(secondsToCrack / 31536000000000)} млн. лет`;
-                emoji = '🦖';
+                iconName = 'infinity';
                 timeColor = '#845ef7';
             } else {
                 timeText = 'Вечность';
-                emoji = '♾️';
+                iconName = 'infinity';
                 timeColor = '#e64980';
             }
-            
+
             const crackTimeEl = document.getElementById('genCrackTime');
-            crackTimeEl.innerHTML = `${emoji} ${timeText}`;
+            crackTimeEl.innerHTML = `<i data-lucide="${iconName}"></i> ${timeText}`;
             crackTimeEl.style.color = timeColor;
+            if (window.lucide) lucide.createIcons();
         }
 
         function copyPassword() {
             if (!AppState.generatedPasswordText) {
-                alert('Сначала сгенерируйте пароль!');
+                showNotification('⚠️ Сначала сгенерируйте пароль!');
                 return;
             }
 
             navigator.clipboard.writeText(AppState.generatedPasswordText).then(() => {
                 showNotification('✅ Пароль скопирован в буфер обмена!');
+                const btn = document.getElementById('copyBtn');
+                if (btn && !btn.disabled) {
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '<i data-lucide="check"></i><span>Скопировано!</span>';
+                    if (window.lucide) lucide.createIcons();
+                    btn.disabled = true;
+                    setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+                }
             }).catch(err => {
-                alert('Не удалось скопировать пароль');
+                showNotification('⚠️ Не удалось скопировать пароль');
             });
         }
 
@@ -1756,7 +1788,7 @@
 
         function exportToTXT() {
             if (!AppState.lastAnalysisResults) {
-                alert('Нет данных для экспорта. Сначала проанализируйте пароль.');
+                showNotification('⚠️ Нет данных для экспорта. Сначала проанализируйте пароль.');
                 return;
             }
 
@@ -1804,7 +1836,7 @@
 
         function exportToJSON() {
             if (!AppState.lastAnalysisResults) {
-                alert('Нет данных для экспорта. Сначала проанализируйте пароль.');
+                showNotification('⚠️ Нет данных для экспорта. Сначала проанализируйте пароль.');
                 return;
             }
 
@@ -1814,7 +1846,7 @@
 
         function exportToCSV() {
             if (!AppState.lastAnalysisResults) {
-                alert('Нет данных для экспорта. Сначала проанализируйте пароль.');
+                showNotification('⚠️ Нет данных для экспорта. Сначала проанализируйте пароль.');
                 return;
             }
 
@@ -1855,7 +1887,7 @@
 
         function exportToHTML() {
             if (!AppState.lastAnalysisResults) {
-                alert('Нет данных для экспорта. Сначала проанализируйте пароль.');
+                showNotification('⚠️ Нет данных для экспорта. Сначала проанализируйте пароль.');
                 return;
             }
 
@@ -2066,26 +2098,15 @@
 
         function toggleExportMenu() {
             const dropdown = document.getElementById('exportDropdown');
-            if (dropdown) {
-                const isVisible = dropdown.style.display === 'block';
-                dropdown.style.display = isVisible ? 'none' : 'block';
-            }
+            if (dropdown) dropdown.classList.toggle('open');
         }
 
         function toggleEntropyTooltip() {
-            const tooltip = document.getElementById('entropyTooltip');
-            if (tooltip) {
-                const isVisible = tooltip.style.display === 'block';
-                tooltip.style.display = isVisible ? 'none' : 'block';
-            }
+            document.getElementById('entropyTooltip')?.classList.toggle('open');
         }
 
         function toggleCrackTimeTooltip() {
-            const tooltip = document.getElementById('crackTimeTooltip');
-            if (tooltip) {
-                const isVisible = tooltip.style.display === 'block';
-                tooltip.style.display = isVisible ? 'none' : 'block';
-            }
+            document.getElementById('crackTimeTooltip')?.classList.toggle('open');
         }
 
         // Close export menu when clicking outside
@@ -2093,12 +2114,20 @@
             const exportSection = document.getElementById('exportSection');
             const exportDropdown = document.getElementById('exportDropdown');
             if (exportSection && exportDropdown && !exportSection.contains(e.target)) {
-                exportDropdown.style.display = 'none';
+                exportDropdown.classList.remove('open');
             }
         });
 
         // Event listeners
         document.getElementById('passwordInput').addEventListener('input', (e) => {
+            const len = e.target.value.length;
+            const counterEl = document.getElementById('charCounter');
+            if (len > 0) {
+                counterEl.innerHTML = `<span class="char-counter-pill"><i data-lucide="type"></i>${len} симв.</span>`;
+                if (window.lucide) lucide.createIcons();
+            } else {
+                counterEl.innerHTML = '';
+            }
             clearTimeout(AppState.debounceTimer);
             AppState.debounceTimer = setTimeout(() => {
                 updatePasswordAnalysis();
