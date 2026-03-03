@@ -24,6 +24,7 @@
             isPasswordVisible: false,
             currentPage: 'analyzer',
             generatedPasswordText: '',
+            generatedPassphraseText: '',
             currentGeneratorMode: 'password',
             currentPassphraseSeparator: '-',
             currentHashFormat: 'hex',
@@ -1569,7 +1570,7 @@
 
             let passphrase = words.join(separator);
 
-            AppState.generatedPasswordText = passphrase;
+            AppState.generatedPassphraseText = passphrase;
             document.getElementById('generatedPassword').textContent = passphrase;
         }
 
@@ -1596,8 +1597,6 @@
             const secondsToCrack = crackTimeResult.seconds;
             const { entropy, charsetSize } = crackTimeResult.patterns;
 
-            document.getElementById('genEntropyBits').textContent = Math.round(entropy);
-
             // Использовать функции анализатора для единой системы оценки
             const analysis = analyzePassword(password);
 
@@ -1605,25 +1604,24 @@
             const finalScore = Math.round(entropy) + (4 * analysis.criteriaCount);
             const displayScore = Math.min(100, finalScore);
 
-            // Определить уровень надежности (пороги 40/70/90)
-            let strength, strengthColor;
+            // Определить цвет по порогам 40/70/90
+            let strengthColor;
             if (displayScore < 40) {
-                strength = 'Слабый';
                 strengthColor = 'var(--accent-red)';
             } else if (displayScore < 70) {
-                strength = 'Средний';
                 strengthColor = 'var(--accent-yellow)';
             } else if (displayScore < 90) {
-                strength = 'Сильный';
                 strengthColor = 'var(--accent-green)';
             } else {
-                strength = 'Очень сильный';
                 strengthColor = 'var(--accent-blue)';
             }
 
             const strengthEl = document.getElementById('genStrength');
-            strengthEl.textContent = strength;
+            strengthEl.textContent = displayScore + '/100';
             strengthEl.style.color = strengthColor;
+
+            // Запустить HIBP проверку для генератора
+            checkPwnedInGenerator(password);
             
             // Format crack time with visual variety (matching analyzer page)
             let timeText = '';
@@ -1692,12 +1690,15 @@
         }
 
         function copyPassword() {
-            if (!AppState.generatedPasswordText) {
+            const textToCopy = AppState.currentGeneratorMode === 'passphrase'
+                ? AppState.generatedPassphraseText
+                : AppState.generatedPasswordText;
+            if (!textToCopy) {
                 showNotification('⚠️ Сначала сгенерируйте пароль!');
                 return;
             }
 
-            navigator.clipboard.writeText(AppState.generatedPasswordText).then(() => {
+            navigator.clipboard.writeText(textToCopy).then(() => {
                 showNotification('✅ Пароль скопирован в буфер обмена!');
                 const btn = document.getElementById('copyBtn');
                 if (btn && !btn.disabled) {
@@ -1710,6 +1711,112 @@
             }).catch(err => {
                 showNotification('⚠️ Не удалось скопировать пароль');
             });
+        }
+
+        // HIBP проверка для компактного блока статистики генератора
+        async function checkPwnedInGenerator(password) {
+            const el = document.getElementById('genHibpResult');
+            if (!el) return;
+            el.textContent = '…';
+            el.style.color = 'var(--text-secondary)';
+
+            try {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(password);
+                const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+                // Проверяем кэш
+                if (AppState.pwnedCache.has(hashHex)) {
+                    displayGenHibpResult(el, AppState.pwnedCache.get(hashHex));
+                    return;
+                }
+
+                const prefix = hashHex.substring(0, 5).toUpperCase();
+                const suffix = hashHex.substring(5).toUpperCase();
+
+                let endpoints = [...HIBP_CONFIG.endpoints];
+                if (HIBP_CONFIG.lastSuccessfulMethod) {
+                    const idx = endpoints.findIndex(e => e.name === HIBP_CONFIG.lastSuccessfulMethod);
+                    if (idx > 0) { const [last] = endpoints.splice(idx, 1); endpoints.unshift(last); }
+                }
+
+                for (let i = 0; i < endpoints.length; i++) {
+                    const endpoint = endpoints[i];
+                    try {
+                        const response = await fetchWithTimeout(endpoint.url(prefix), {
+                            mode: 'cors',
+                            headers: { 'User-Agent': 'KhodyrevGuard-Password-Analyzer' }
+                        }, endpoint.timeout);
+                        if (response.ok) {
+                            const text = await response.text();
+                            const count = parseHIBPResponse(text, suffix);
+                            AppState.pwnedCache.set(hashHex, count);
+                            try { sessionStorage.setItem('hibpCache', JSON.stringify(Object.fromEntries(AppState.pwnedCache))); } catch(e) {}
+                            HIBP_CONFIG.lastSuccessfulMethod = endpoint.name;
+                            displayGenHibpResult(el, count);
+                            return;
+                        }
+                    } catch (err) {
+                        if (i === endpoints.length - 1) throw err;
+                    }
+                }
+                throw new Error('HIBP недоступен');
+            } catch (e) {
+                el.textContent = 'N/A';
+                el.style.color = 'var(--text-secondary)';
+            }
+        }
+
+        function displayGenHibpResult(el, count) {
+            if (count === 0) {
+                el.textContent = 'Чист';
+                el.style.color = 'var(--accent-green)';
+            } else if (count > 0) {
+                let label;
+                if (count >= 1000000) label = '>' + Math.floor(count / 1000000) + 'М ут.';
+                else if (count >= 1000) label = Math.floor(count / 1000) + 'тыс. ут.';
+                else label = count + ' ут.';
+                el.textContent = label;
+                el.style.color = 'var(--accent-red)';
+            } else {
+                el.textContent = 'N/A';
+                el.style.color = 'var(--text-secondary)';
+            }
+        }
+
+        // Отправить сгенерированный пароль в анализатор
+        function analyzeGeneratedPassword() {
+            const textToAnalyze = AppState.currentGeneratorMode === 'passphrase'
+                ? AppState.generatedPassphraseText
+                : AppState.generatedPasswordText;
+            if (!textToAnalyze) {
+                showNotification('⚠️ Сначала сгенерируйте пароль!');
+                return;
+            }
+            document.getElementById('passwordInput').value = textToAnalyze;
+
+            // Переключить активную nav-вкладку
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+            const analyzerTab = document.querySelector('.nav-tab[aria-controls="analyzerPage"]');
+            analyzerTab.classList.add('active');
+            analyzerTab.setAttribute('aria-selected', 'true');
+
+            // Переключить страницу с анимацией
+            AppState.currentPage = 'analyzer';
+            const currentPageEl = document.querySelector('.page.active');
+            if (currentPageEl) {
+                currentPageEl.classList.add('page-exit');
+                setTimeout(() => {
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active', 'page-exit'));
+                    document.getElementById('analyzerPage').classList.add('active');
+                    document.getElementById('passwordInput').dispatchEvent(new Event('input'));
+                }, 180);
+            }
         }
 
         // === Generator Mode Switching ===
@@ -1744,9 +1851,19 @@
                 generateBtn.onclick = generatePassphrase;
             }
 
-            // Reset generated password display
-            document.getElementById('generatedPassword').textContent = 'Нажмите "Сгенерировать" для создания ' + (mode === 'password' ? 'пароля' : 'парольной фразы');
-            AppState.generatedPasswordText = '';
+            // Восстановить текст для выбранного режима или показать placeholder
+            const storedText = mode === 'password' ? AppState.generatedPasswordText : AppState.generatedPassphraseText;
+            if (storedText) {
+                document.getElementById('generatedPassword').textContent = storedText;
+            } else {
+                document.getElementById('generatedPassword').textContent = 'Нажмите "Сгенерировать" для создания ' + (mode === 'password' ? 'пароля' : 'парольной фразы');
+                // Сброс статистики — она относится к другому режиму
+                ['genStrength', 'genHibpResult', 'genCrackTime'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.textContent = '—';
+                    el.style.color = '';
+                });
+            }
         }
 
         function selectSeparator(separator) {
