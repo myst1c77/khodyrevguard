@@ -985,6 +985,10 @@
             background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
         }
 
+        [data-theme="light"] .logo-icon {
+            color: white;
+        }
+
         [data-theme="light"] .nav-tab {
             background: #ffffff;
             border: 2px solid #dee2e6;
@@ -1336,6 +1340,10 @@
             font-size: clamp(1.2rem, 3.5vw, 1.8rem);
             font-weight: bold;
             color: var(--accent-blue);
+        }
+
+        .gen-hibp-value {
+            font-size: clamp(1rem, 3vw, 1.4rem);
         }
 
         .entropy-label {
@@ -1804,6 +1812,17 @@
             background: var(--bg-card);
             color: var(--text-primary);
             border: 2px solid var(--accent-blue);
+        }
+
+        .btn-analyze {
+            background: transparent;
+            color: var(--accent-green);
+            border: 2px solid var(--accent-green);
+        }
+
+        .btn-analyze:hover {
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25) !important;
         }
 
         .btn:hover {
