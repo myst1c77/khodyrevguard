@@ -377,6 +377,25 @@
         top: 10px;
         right: 10px;
     }
+
+    /* Card: less padding */
+    .comparator-card { padding: 14px; }
+
+    /* Criteria: single column */
+    .comp-criteria-grid {
+        grid-template-columns: 1fr;
+        gap: 5px 0;
+    }
+
+    /* Stats: reduce padding, allow text wrap */
+    .comp-stat { padding: 12px 8px; min-width: 0; }
+    .comp-stat-value { font-size: 0.9rem; white-space: normal; word-break: break-word; }
+    .comp-stat-label { font-size: 0.8rem; white-space: normal; }
+
+    /* Verdict: tighter */
+    .comparator-verdict { padding: 12px 14px; }
+    .comparator-verdict-text { font-size: 1.1rem; }
+    .comparator-verdict-sub { font-size: 0.9rem; }
 }
 
 /* ---- Shield icon accent colors (all themes) ---- */
