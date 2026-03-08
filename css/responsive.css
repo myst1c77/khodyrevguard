@@ -212,6 +212,32 @@
     .export-desc {
         font-size: 0.75rem;
     }
+
+    /* Comparator: reduce card padding, criteria 1-col, stats text wrap */
+    .comparator-card { padding: 16px; }
+    .comp-criteria-grid { grid-template-columns: 1fr; }
+    .comp-stat-value { font-size: 0.85rem; white-space: normal; }
+    .comp-stat-label { font-size: 0.8rem; white-space: normal; }
+
+    /* Strength: cap details at 2 columns */
+    .strength-details { grid-template-columns: repeat(2, 1fr); }
+
+    /* Crack card: smaller danger icon */
+    .crack-danger-icon { width: 36px; height: 36px; }
+    .crack-danger-icon svg { width: 20px; height: 20px; }
+
+    /* Generator: reduce container padding */
+    .generated-password-container { padding: 16px; }
+    .batch-count-selector { padding-right: 0; flex-wrap: wrap; }
+
+    /* Memorability hint: tighter on mobile */
+    .memorability-hint { padding: 14px; gap: 10px; }
+
+    /* Status bar: reduce side padding */
+    .status-bar { padding: 0 12px; }
+
+    /* iOS safe area support */
+    body { padding-bottom: env(safe-area-inset-bottom); }
 }
 
 /* ---- Small mobile (max 480px) ---- */
@@ -232,6 +258,54 @@
     .tip-card {
         padding: 15px;
     }
+
+    /* Tighter content area */
+    .content-area { padding: 8px; }
+    .main-card { padding: 12px; border-radius: 12px; }
+
+    /* Comparator cards: tighter */
+    .comparator-card { padding: 12px; }
+    .comp-stats { flex-direction: column; gap: 6px; }
+    .comp-stat { padding: 10px 12px; }
+
+    /* Format options: 2 columns instead of 3 */
+    .format-option { flex: 0 0 calc(50% - 5px); }
+
+    /* Generator batch: wrap buttons on tiny screens */
+    .batch-count-options { flex-wrap: wrap; justify-content: center; }
+    .batch-count-selector { flex-direction: column; gap: 6px; align-items: flex-start; }
+
+    /* Generator buttons: stack vertically */
+    .generator-buttons { flex-direction: column; }
+    .generator-buttons .btn { width: 100%; }
+
+    /* Strength visualization: tighter */
+    .strength-visualization { padding: 12px; }
+    .crack-time-danger { padding: 12px 14px; gap: 10px; }
+    .crack-danger-icon { width: 32px; height: 32px; }
+    .crack-danger-icon svg { width: 18px; height: 18px; }
+    .crack-metric-label { font-size: 0.9rem; gap: 5px; }
+    .crack-metric-label svg { width: 16px; height: 16px; }
+
+    /* Status bar: condensed */
+    .status-bar { padding: 0 8px; }
+    .status-page-title { font-size: 0.88rem; }
+    .status-bar-right { font-size: 0.72rem; }
+}
+
+/* ---- Very small phones (max 360px) ---- */
+
+@media (max-width: 360px) {
+    .content-area { padding: 6px; }
+    .main-card { padding: 10px; }
+    .status-page-title {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .batch-count-btn { width: 32px; height: 32px; font-size: 0.85rem; }
+    .separator-selector { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* ---- Landscape mobile optimization ---- */
