@@ -14,7 +14,9 @@
             pwnedCache: new Map(), // Кэш для HIBP проверок (SHA-1 hash -> breach count)
             batchCount: 1,         // Количество паролей для пакетной генерации (1–8)
             batchPasswords: [],    // Массив { text, score, color } для пакетного режима
-            selectedBatchIndex: 0  // Индекс выбранного пароля в пакете
+            selectedBatchIndex: 0, // Индекс выбранного пароля в пакете
+            analyzedCount: 0,      // Счётчик проверенных паролей
+            generatedCount: 0      // Счётчик сгенерированных паролей
         };
 
         // Восстанавливаем HIBP-кэш из sessionStorage (живёт до закрытия вкладки)
@@ -37,6 +39,33 @@
             }, 3000);
         }
 
+        // Sidebar toggle
+        function openSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const btn = document.getElementById('hamburgerBtn');
+            if (sidebar) sidebar.classList.add('open');
+            if (backdrop) backdrop.classList.add('visible');
+            if (btn) btn.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const btn = document.getElementById('hamburgerBtn');
+            if (sidebar) sidebar.classList.remove('open');
+            if (backdrop) backdrop.classList.remove('visible');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+
+        // Status counters
+        function updateStatusCounters() {
+            const a = document.getElementById('analyzedCountEl');
+            const g = document.getElementById('generatedCountEl');
+            if (a) a.textContent = AppState.analyzedCount;
+            if (g) g.textContent = AppState.generatedCount;
+        }
+
         // Page switching
         function switchPage(page, event) {
             const currentPageEl = document.querySelector('.page.active');
@@ -44,16 +73,34 @@
 
             AppState.currentPage = page;
 
-            // Update tabs immediately
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
-                tab.setAttribute('aria-selected', 'false');
+            // Update sidebar items (replaces old .nav-tab logic)
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+                item.setAttribute('aria-selected', 'false');
             });
-            if (event && event.target) {
-                const activeTab = event.target.closest('.nav-tab');
-                activeTab.classList.add('active');
-                activeTab.setAttribute('aria-selected', 'true');
+            const activeItem = document.querySelector(`.sidebar-item[data-page="${page}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+                activeItem.setAttribute('aria-selected', 'true');
             }
+
+            // Update status bar title
+            const titles = { analyzer: 'Анализатор', comparator: 'Сравнитель', generator: 'Генератор', hasher: 'Хеш-генератор' };
+            const titleEl = document.getElementById('statusPageTitle');
+            if (titleEl) titleEl.textContent = titles[page] || page;
+
+            // Toggle inspector panel (only on analyzer)
+            const contentArea = document.getElementById('contentArea');
+            const inspectorPanel = document.getElementById('inspectorPanel');
+            if (page === 'analyzer') {
+                contentArea?.classList.add('has-inspector');
+            } else {
+                contentArea?.classList.remove('has-inspector');
+                inspectorPanel?.classList.remove('visible');
+            }
+
+            // Close sidebar on mobile after navigation
+            closeSidebar();
 
             // Fade out current page, then switch
             if (currentPageEl) {
@@ -121,14 +168,21 @@
             }
             document.getElementById('passwordInput').value = textToAnalyze;
 
-            // Переключить активную nav-вкладку
-            document.querySelectorAll('.nav-tab').forEach(t => {
+            // Переключить активный пункт сайдбара
+            document.querySelectorAll('.sidebar-item').forEach(t => {
                 t.classList.remove('active');
                 t.setAttribute('aria-selected', 'false');
             });
-            const analyzerTab = document.querySelector('.nav-tab[aria-controls="analyzerPage"]');
-            analyzerTab.classList.add('active');
-            analyzerTab.setAttribute('aria-selected', 'true');
+            const analyzerItem = document.querySelector('.sidebar-item[data-page="analyzer"]');
+            if (analyzerItem) {
+                analyzerItem.classList.add('active');
+                analyzerItem.setAttribute('aria-selected', 'true');
+            }
+            // Update status bar title
+            const titleEl2 = document.getElementById('statusPageTitle');
+            if (titleEl2) titleEl2.textContent = 'Анализатор';
+            // Show inspector
+            document.getElementById('contentArea')?.classList.add('has-inspector');
 
             // Переключить страницу с анимацией
             AppState.currentPage = 'analyzer';
@@ -254,13 +308,24 @@
                 btn.addEventListener('click', () => switchTheme(btn.dataset.theme));
             });
 
-            // Nav tabs
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.addEventListener('click', (e) => {
-                    const page = tab.getAttribute('aria-controls').replace('Page', '');
-                    switchPage(page, e);
+            // Sidebar nav items (replaces .nav-tab)
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    switchPage(item.dataset.page, e);
                 });
             });
+
+            // Hamburger button (mobile sidebar toggle)
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', () => {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar && sidebar.classList.contains('open')) closeSidebar();
+                    else openSidebar();
+                });
+            }
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+            if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeSidebar);
 
             // Analyzer: visibility toggle
             const toggleBtn = document.getElementById('toggleBtn');
