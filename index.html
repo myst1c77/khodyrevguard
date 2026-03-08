@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="css/comparator.css">
     <link rel="stylesheet" href="css/notifications.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/sidebar.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -30,53 +31,74 @@
     <meta property="og:description" content="Анализируйте и генерируйте надёжные пароли онлайн.">
 </head>
 <body>
-    <!-- Theme Switcher -->
-    <div class="theme-switcher">
-        <button class="theme-btn" data-theme="original" title="Оригинальная">
-            <span class="theme-dot"></span>
-            <span class="theme-tooltip">Оригинал</span>
-        </button>
-        <button class="theme-btn" data-theme="blue" title="Синяя">
-            <span class="theme-dot"></span>
-            <span class="theme-tooltip">Синяя</span>
-        </button>
-        <button class="theme-btn" data-theme="dark" title="Тёмная">
-            <span class="theme-dot"></span>
-            <span class="theme-tooltip">Тёмная</span>
-        </button>
-        <button class="theme-btn active" data-theme="light" title="Светлая">
-            <span class="theme-dot"></span>
-            <span class="theme-tooltip">Светлая</span>
-        </button>
-    </div>
+    <div class="app-shell" id="appShell">
 
-    <div class="container">
-        <header>
-            <div class="logo">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
                 <div class="logo-icon"><i data-lucide="shield-half"></i></div>
-                <h1>KhodyrevGuard</h1>
+                <span class="sidebar-brand">KhodyrevGuard</span>
             </div>
-            <p class="subtitle">Профессиональный анализатор надежности паролей</p>
-        </header>
+            <nav class="sidebar-nav">
+                <button type="button" class="sidebar-item active" data-page="analyzer" role="tab" aria-selected="true" aria-controls="analyzerPage">
+                    <i data-lucide="shield-check"></i>
+                    <span class="sidebar-label">Анализатор</span>
+                </button>
+                <button type="button" class="sidebar-item" data-page="comparator" role="tab" aria-selected="false" aria-controls="comparatorPage">
+                    <i data-lucide="git-compare"></i>
+                    <span class="sidebar-label">Сравнитель</span>
+                </button>
+                <button type="button" class="sidebar-item" data-page="generator" role="tab" aria-selected="false" aria-controls="generatorPage">
+                    <i data-lucide="shuffle"></i>
+                    <span class="sidebar-label">Генератор</span>
+                </button>
+                <button type="button" class="sidebar-item" data-page="hasher" role="tab" aria-selected="false" aria-controls="hasherPage">
+                    <i data-lucide="key-round"></i>
+                    <span class="sidebar-label">Хеш-генератор</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="theme-switcher sidebar-theme-switcher">
+                    <button class="theme-btn" data-theme="original" title="Оригинальная">
+                        <span class="theme-dot"></span>
+                        <span class="theme-tooltip">Оригинал</span>
+                    </button>
+                    <button class="theme-btn" data-theme="blue" title="Синяя">
+                        <span class="theme-dot"></span>
+                        <span class="theme-tooltip">Синяя</span>
+                    </button>
+                    <button class="theme-btn" data-theme="dark" title="Тёмная">
+                        <span class="theme-dot"></span>
+                        <span class="theme-tooltip">Тёмная</span>
+                    </button>
+                    <button class="theme-btn" data-theme="light" title="Светлая">
+                        <span class="theme-dot"></span>
+                        <span class="theme-tooltip">Светлая</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
 
-        <nav class="nav-tabs" role="tablist" aria-label="Разделы приложения">
-            <button type="button" class="nav-tab active" role="tab" aria-selected="true" aria-controls="analyzerPage">
-                <i data-lucide="shield-check"></i>
-                <span>Анализатор</span>
-            </button>
-            <button type="button" class="nav-tab" role="tab" aria-selected="false" aria-controls="comparatorPage">
-                <i data-lucide="git-compare"></i>
-                <span>Сравнитель</span>
-            </button>
-            <button type="button" class="nav-tab" role="tab" aria-selected="false" aria-controls="generatorPage">
-                <i data-lucide="shuffle"></i>
-                <span>Генератор</span>
-            </button>
-            <button type="button" class="nav-tab" role="tab" aria-selected="false" aria-controls="hasherPage">
-                <i data-lucide="key-round"></i>
-                <span>Хеш-генератор</span>
-            </button>
-        </nav>
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <div class="main-area">
+            <!-- Status Bar -->
+            <header class="status-bar">
+                <div class="status-bar-left">
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Меню" aria-expanded="false" aria-controls="sidebar">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <span class="status-page-title" id="statusPageTitle">Анализатор</span>
+                </div>
+                <div class="status-bar-right">
+                    Проверено: <strong id="analyzedCountEl">0</strong>
+                    &nbsp;|&nbsp;
+                    Сгенерировано: <strong id="generatedCountEl">0</strong>
+                </div>
+            </header>
+
+            <div class="content-area has-inspector" id="contentArea">
+                <main class="page-column">
 
         <!-- Analyzer Page -->
         <div id="analyzerPage" class="page active">
@@ -135,103 +157,67 @@
                     </div>
                 </div>
 
+                <!-- LEAK strip: compact, below strength score -->
                 <div class="pwned-status" id="pwnedStatus" aria-live="polite" aria-atomic="true">
                     <span id="pwnedText"></span>
                 </div>
 
-                <div class="criteria-grid" id="criteriaGrid">
-                    <div class="criterion" data-criterion="length">
-                        <span class="criterion-icon"><i data-lucide="ruler"></i></span>
-                        <div class="criterion-text">
-                            <div>Минимум 12 символов (рекомендуется 16+)</div>
-                            <div class="criterion-hint">Добавьте больше символов для усиления пароля</div>
+                <!-- Info Cards Row: CRACK | ENTROPY -->
+                <div class="info-cards-row">
+
+                <div class="crack-time-card info-card" id="crackTimeCard" data-card-label="CRACK">
+                    <div class="info-card-body">
+                        <div class="crack-time-danger" id="crackTimeDanger">
+                            <div class="crack-danger-icon" id="crackDangerIcon">
+                                <i data-lucide="shield"></i>
+                            </div>
+                            <div class="crack-danger-info">
+                                <div class="crack-danger-level" id="crackDangerLevel">Уровень угрозы</div>
+                                <div class="crack-danger-sublabel" id="crackDangerSublabel">Введите пароль</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="criterion" data-criterion="uppercase">
-                        <span class="criterion-icon"><i data-lucide="chevron-up"></i></span>
-                        <div class="criterion-text">
-                            <div>Заглавные буквы (A-Z)</div>
-                            <div class="criterion-hint">Используйте хотя бы одну заглавную букву</div>
-                        </div>
-                    </div>
-                    <div class="criterion" data-criterion="lowercase">
-                        <span class="criterion-icon"><i data-lucide="chevron-down"></i></span>
-                        <div class="criterion-text">
-                            <div>Строчные буквы (a-z)</div>
-                            <div class="criterion-hint">Добавьте строчные буквы</div>
-                        </div>
-                    </div>
-                    <div class="criterion" data-criterion="numbers">
-                        <span class="criterion-icon"><i data-lucide="hash"></i></span>
-                        <div class="criterion-text">
-                            <div>Цифры (0-9)</div>
-                            <div class="criterion-hint">Включите хотя бы одну цифру</div>
-                        </div>
-                    </div>
-                    <div class="criterion" data-criterion="special">
-                        <span class="criterion-icon"><i data-lucide="zap"></i></span>
-                        <div class="criterion-text">
-                            <div>Специальные символы (!@#$%^&*)</div>
-                            <div class="criterion-hint">Добавьте специальные символы для большей безопасности</div>
-                        </div>
-                    </div>
-                    <div class="criterion" data-criterion="sequences">
-                        <span class="criterion-icon"><i data-lucide="keyboard"></i></span>
-                        <div class="criterion-text">
-                            <div>Без клавиатурных паттернов</div>
-                            <div class="criterion-hint">Избегайте клавиатурных паттернов (qwerty, 123, йцукен)</div>
-                        </div>
-                    </div>
-                    <div class="criterion" data-criterion="repeating">
-                        <span class="criterion-icon"><i data-lucide="repeat-2"></i></span>
-                        <div class="criterion-text">
-                            <div>Без повторяющихся символов (aaa, 111)</div>
-                            <div class="criterion-hint">Не используйте повторяющиеся символы подряд</div>
-                        </div>
-                    </div>
-                    <div class="criterion" data-criterion="dates">
-                        <span class="criterion-icon"><i data-lucide="calendar-x"></i></span>
-                        <div class="criterion-text">
-                            <div>Без дат рождения и годовщин</div>
-                            <div class="criterion-hint">Избегайте дат в любом формате (01.01.1990, 2000, jan1990)</div>
-                        </div>
-                    </div>
-                    <div class="criterion" data-criterion="leetspeak">
-                        <span class="criterion-icon"><i data-lucide="replace"></i></span>
-                        <div class="criterion-text">
-                            <div>Без словарных слов и l33t-speak замен</div>
-                            <div class="criterion-hint">Избегайте словарных слов, имён и замены букв символами</div>
+                        <div class="crack-time-metrics">
+                            <div class="crack-time-metric">
+                                <div class="crack-metric-label">
+                                    <i data-lucide="cpu"></i> Brute-force
+                                    <span class="entropy-info-icon" id="crackTimeInfoIcon" title="Как рассчитывается время взлома?"><i data-lucide="info"></i></span>
+                                </div>
+                                <div class="crack-metric-value" id="crackTime">—</div>
+                            </div>
+                            <div class="crack-time-metric">
+                                <div class="crack-metric-label">
+                                    <i data-lucide="brain"></i> zxcvbn
+                                    <span class="entropy-info-icon" id="zxcvbnCrackTimeInfoIcon" title="Как zxcvbn оценивает время взлома?"><i data-lucide="info"></i></span>
+                                </div>
+                                <div class="crack-metric-value" id="crackTimeZxcvbn">—</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="crack-time-card" id="crackTimeCard">
-                    <div class="crack-time-danger" id="crackTimeDanger">
-                        <div class="crack-danger-icon" id="crackDangerIcon">
-                            <i data-lucide="shield"></i>
-                        </div>
-                        <div class="crack-danger-info">
-                            <div class="crack-danger-level" id="crackDangerLevel">Уровень угрозы</div>
-                            <div class="crack-danger-sublabel" id="crackDangerSublabel">Введите пароль</div>
-                        </div>
-                    </div>
-                    <div class="crack-time-metrics">
-                        <div class="crack-time-metric">
-                            <div class="crack-metric-label">
-                                <i data-lucide="cpu"></i> Brute-force
-                                <span class="entropy-info-icon" id="crackTimeInfoIcon" title="Как рассчитывается время взлома?"><i data-lucide="info"></i></span>
+                <!-- ENTROPY card -->
+                <div class="entropy-info info-card" id="entropyInfo" data-card-label="ENTROPY">
+                    <div class="info-card-body">
+                        <div class="entropy-stat">
+                            <div class="entropy-value" id="entropyBits">0</div>
+                            <div class="entropy-label">
+                                Энтропия Шеннона
+                                <span class="entropy-info-icon" id="entropyInfoIcon" title="Как рассчитывается энтропия?"><i data-lucide="info"></i></span>
                             </div>
-                            <div class="crack-metric-value" id="crackTime">—</div>
                         </div>
-                        <div class="crack-time-metric">
-                            <div class="crack-metric-label">
-                                <i data-lucide="brain"></i> zxcvbn
-                                <span class="entropy-info-icon" id="zxcvbnCrackTimeInfoIcon" title="Как zxcvbn оценивает время взлома?"><i data-lucide="info"></i></span>
-                            </div>
-                            <div class="crack-metric-value" id="crackTimeZxcvbn">—</div>
+                        <div class="entropy-stat">
+                            <div class="entropy-value" id="charsetSize">0</div>
+                            <div class="entropy-label">Размер набора</div>
+                        </div>
+                        <div class="entropy-stat">
+                            <div class="entropy-value" id="combinations">0</div>
+                            <div class="entropy-label">Комбинаций</div>
                         </div>
                     </div>
                 </div>
+
+
+                </div><!-- /.info-cards-row -->
 
                 <!-- Crack Time Tooltip -->
                 <div class="entropy-tooltip" id="crackTimeTooltip">
@@ -287,24 +273,6 @@
                         <div class="entropy-note">
                             <p>⚠️ <em>Эта оценка, в отличие от чистого теоретического brute-force, учитывает более 50 000 популярных паролей и слов, в том числе с заменами в стиле l33t speak, а также клавиатурные паттерны, даты, имена и повторяющиеся последовательности. Слабые словарные пароли взламываются мгновенно даже при сложном виде.</em></p>
                         </div>
-                    </div>
-                </div>
-
-                <div class="entropy-info" id="entropyInfo">
-                    <div class="entropy-stat">
-                        <div class="entropy-value" id="charsetSize">0</div>
-                        <div class="entropy-label">Размер набора</div>
-                    </div>
-                    <div class="entropy-stat">
-                        <div class="entropy-value" id="entropyBits">0</div>
-                        <div class="entropy-label">
-                            Энтропия Шеннона
-                            <span class="entropy-info-icon" id="entropyInfoIcon" title="Как рассчитывается энтропия?"><i data-lucide="info"></i></span>
-                        </div>
-                    </div>
-                    <div class="entropy-stat">
-                        <div class="entropy-value" id="combinations">0</div>
-                        <div class="entropy-label">Комбинаций</div>
                     </div>
                 </div>
 
@@ -942,7 +910,84 @@
                 </div>
             </div>
         </div>
-    </div>
+                </main><!-- /.page-column -->
+
+                <!-- Inspector Panel (Analyzer, desktop ≥1280px) -->
+                <aside class="inspector-panel" id="inspectorPanel" aria-label="Детали пароля">
+                    <div class="inspector-header">
+                        <i data-lucide="shield-check"></i>
+                        <span>Критерии безопасности</span>
+                    </div>
+                    <div class="criteria-grid" id="criteriaGrid">
+                        <div class="criterion" data-criterion="length">
+                            <span class="criterion-icon"><i data-lucide="ruler"></i></span>
+                            <div class="criterion-text">
+                                <div>Минимум 12 символов (рекомендуется 16+)</div>
+                                <div class="criterion-hint">Добавьте больше символов для усиления пароля</div>
+                            </div>
+                        </div>
+                        <div class="criterion" data-criterion="uppercase">
+                            <span class="criterion-icon"><i data-lucide="chevron-up"></i></span>
+                            <div class="criterion-text">
+                                <div>Заглавные буквы (A-Z)</div>
+                                <div class="criterion-hint">Используйте хотя бы одну заглавную букву</div>
+                            </div>
+                        </div>
+                        <div class="criterion" data-criterion="lowercase">
+                            <span class="criterion-icon"><i data-lucide="chevron-down"></i></span>
+                            <div class="criterion-text">
+                                <div>Строчные буквы (a-z)</div>
+                                <div class="criterion-hint">Добавьте строчные буквы</div>
+                            </div>
+                        </div>
+                        <div class="criterion" data-criterion="numbers">
+                            <span class="criterion-icon"><i data-lucide="hash"></i></span>
+                            <div class="criterion-text">
+                                <div>Цифры (0-9)</div>
+                                <div class="criterion-hint">Включите хотя бы одну цифру</div>
+                            </div>
+                        </div>
+                        <div class="criterion" data-criterion="special">
+                            <span class="criterion-icon"><i data-lucide="zap"></i></span>
+                            <div class="criterion-text">
+                                <div>Специальные символы (!@#$%^&*)</div>
+                                <div class="criterion-hint">Добавьте специальные символы для большей безопасности</div>
+                            </div>
+                        </div>
+                        <div class="criterion" data-criterion="sequences">
+                            <span class="criterion-icon"><i data-lucide="keyboard"></i></span>
+                            <div class="criterion-text">
+                                <div>Без клавиатурных паттернов</div>
+                                <div class="criterion-hint">Избегайте клавиатурных паттернов (qwerty, 123, йцукен)</div>
+                            </div>
+                        </div>
+                        <div class="criterion" data-criterion="repeating">
+                            <span class="criterion-icon"><i data-lucide="repeat-2"></i></span>
+                            <div class="criterion-text">
+                                <div>Без повторяющихся символов (aaa, 111)</div>
+                                <div class="criterion-hint">Не используйте повторяющиеся символы подряд</div>
+                            </div>
+                        </div>
+                        <div class="criterion" data-criterion="dates">
+                            <span class="criterion-icon"><i data-lucide="calendar-x"></i></span>
+                            <div class="criterion-text">
+                                <div>Без дат рождения и годовщин</div>
+                                <div class="criterion-hint">Избегайте дат в любом формате (01.01.1990, 2000, jan1990)</div>
+                            </div>
+                        </div>
+                        <div class="criterion" data-criterion="leetspeak">
+                            <span class="criterion-icon"><i data-lucide="replace"></i></span>
+                            <div class="criterion-text">
+                                <div>Без словарных слов и l33t-speak замен</div>
+                                <div class="criterion-hint">Избегайте словарных слов, имён и замены букв символами</div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+            </div><!-- /.content-area -->
+        </div><!-- /.main-area -->
+    </div><!-- /.app-shell -->
 
     <div class="copy-notification" id="copyNotification"></div>
 
