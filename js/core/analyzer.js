@@ -211,7 +211,7 @@ function formatCrackTime(seconds, elementId = 'crackTime') {
     const element = document.getElementById(elementId);
     if (element) {
         element.style.color = color;
-        element.innerHTML = `<i data-lucide="${iconName}"></i> ${timeText}`;
+        element.innerHTML = `<i data-lucide="${iconName}"></i>&nbsp;${timeText}`;
         if (window.lucide) lucide.createIcons();
     }
 
@@ -518,7 +518,7 @@ async function updatePasswordAnalysis() {
         strengthSegments.dataset.active = '4';
     }
 
-    document.getElementById('crackTimeCard').style.display = 'block';
+    document.getElementById('crackTimeCard').style.display = 'flex';
     document.getElementById('entropyInfo').style.display = 'flex';
 
     // Calculate crack time based on adjusted time
@@ -590,6 +590,13 @@ async function updatePasswordAnalysis() {
         pwnedStatus: pwnedCount > 0 ? 'Скомпрометирован' : (pwnedCount === 0 ? 'Безопасен' : 'Проверка недоступна')
     };
 
+    // Update status counter
+    AppState.analyzedCount++;
+    if (typeof updateStatusCounters === 'function') updateStatusCounters();
+
+    // Show inspector panel (desktop only, controlled by CSS)
+    document.getElementById('inspectorPanel')?.classList.add('visible');
+
     // Show export button
     const exportSection = document.getElementById('exportSection');
     if (exportSection) {
@@ -631,4 +638,7 @@ function resetAnalysis() {
         exportDropdown.classList.remove('open');
     }
     AppState.lastAnalysisResults = null;
+
+    // Hide inspector panel
+    document.getElementById('inspectorPanel')?.classList.remove('visible');
 }

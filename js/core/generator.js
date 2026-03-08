@@ -136,6 +136,10 @@ function generatePassphrase() {
             el.classList.toggle('active', i === 0);
         });
     }
+
+    // Update status counter
+    AppState.generatedCount++;
+    if (typeof updateStatusCounters === 'function') updateStatusCounters();
 }
 
 // Строит один пароль по текущим настройкам (без DOM-эффектов)
@@ -243,7 +247,7 @@ function _updateGenStats(password) {
     }
 
     const crackTimeEl = document.getElementById('genCrackTime');
-    crackTimeEl.innerHTML = `<i data-lucide="${iconName}"></i> ${timeText}`;
+    crackTimeEl.innerHTML = `<i data-lucide="${iconName}"></i>&nbsp;${timeText}`;
     crackTimeEl.style.color = timeColor;
 
     if (genZxcvbnForScore) {
@@ -340,6 +344,10 @@ function generateCustomPassword() {
         renderBatchList(passwords);
         selectBatchItem(0);
     }
+
+    // Update status counter
+    AppState.generatedCount++;
+    if (typeof updateStatusCounters === 'function') updateStatusCounters();
 }
 
 // === Generator Mode Switching ===
