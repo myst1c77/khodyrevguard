@@ -1,0 +1,359 @@
+/* =============================================
+   ENTROPY — Блок энтропии, tooltip, pwned-статус
+   ============================================= */
+
+/* ---- Entropy Info Block ---- */
+
+.entropy-info {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.entropy-stat {
+    text-align: center;
+    flex: 1;
+    min-width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.entropy-value {
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+    font-weight: bold;
+    color: var(--accent-blue);
+    min-height: clamp(1.8rem, 4.5vw, 2.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gen-hibp-value {
+    font-size: clamp(1rem, 3vw, 1.4rem);
+}
+
+.entropy-label {
+    color: var(--text-secondary);
+    font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.entropy-label svg.lucide {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+}
+
+/* ---- Entropy Info Icon (кнопка раскрытия tooltip) ---- */
+
+.entropy-info-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+    cursor: pointer;
+    opacity: 0.65;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    user-select: none;
+    vertical-align: middle;
+}
+
+.entropy-info-icon i, .entropy-info-icon svg.lucide {
+    width: 15px;
+    height: 15px;
+}
+
+.entropy-info-icon:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* ---- Entropy Tooltip ---- */
+
+.entropy-tooltip {
+    background: linear-gradient(135deg,
+        var(--accent-blue) 0%,
+        rgba(var(--accent-blue-rgb, 58, 134, 255), 0.8) 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    display: none;
+}
+
+.entropy-tooltip.open {
+    display: block;
+    animation: tooltipOpen 0.25s ease forwards;
+}
+
+.entropy-tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.entropy-tooltip-icon {
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+}
+
+.entropy-tooltip-icon i, .entropy-tooltip-icon svg.lucide {
+    width: 28px;
+    height: 28px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.entropy-tooltip-title {
+    font-size: clamp(1.1rem, 2.8vw, 1.4rem);
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.entropy-tooltip-content {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 20px;
+    color: white;
+    line-height: 1.7;
+}
+
+.entropy-formula,
+.entropy-calculation,
+.entropy-explanation,
+.entropy-examples,
+.entropy-note {
+    margin-bottom: 20px;
+}
+
+.entropy-note {
+    margin-bottom: 0;
+}
+
+.entropy-tooltip-content p {
+    margin: 10px 0;
+    font-size: clamp(0.9rem, 2.2vw, 1rem);
+    line-height: 1.7;
+}
+
+.entropy-tooltip-content strong {
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.entropy-tooltip-content code {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    color: #ffffff;
+    display: inline-block;
+    margin: 3px 2px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-weight: 500;
+}
+
+.entropy-tooltip-content ul {
+    margin: 12px 0;
+    padding-left: 25px;
+}
+
+.entropy-tooltip-content li {
+    margin: 10px 0;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    line-height: 1.7;
+}
+
+.entropy-tooltip-content sub {
+    font-size: 0.75em;
+    vertical-align: sub;
+}
+
+.entropy-note p {
+    font-style: italic;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 12px 15px;
+    border-radius: 10px;
+    border-left: 4px solid rgba(255, 255, 255, 0.6);
+    font-size: clamp(0.85rem, 2vw, 0.93rem);
+}
+
+/* ---- Pwned Status ---- */
+
+.pwned-status {
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+}
+
+.pwned-status.show {
+    display: flex;
+}
+
+.pwned-status.safe {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--accent-green);
+}
+
+.pwned-status.compromised {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--accent-red);
+}
+
+.pwned-status.checking {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: var(--accent-blue);
+}
+
+.pwned-status.checking::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(59, 130, 246, 0.25);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+#pwnedText {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+/* ---- Theme-specific entropy tooltip colors ---- */
+
+/* Original theme (фиолетово-синий) */
+[data-theme="original"] .entropy-tooltip {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.3);
+}
+
+[data-theme="original"] .entropy-tooltip-content {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="original"] .entropy-tooltip-content code {
+    background: rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Blue theme (чистый синий) */
+[data-theme="blue"] .entropy-tooltip {
+    background: linear-gradient(135deg, #0288d1 0%, #00bcd4 100%);
+    box-shadow: 0 6px 25px rgba(2, 136, 209, 0.3);
+}
+
+[data-theme="blue"] .entropy-tooltip-content {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="blue"] .entropy-tooltip-content code {
+    background: rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark theme (темно-серый с синим акцентом) */
+[data-theme="dark"] .entropy-tooltip {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(74, 158, 255, 0.3);
+}
+
+[data-theme="dark"] .entropy-tooltip-content {
+    background: rgba(74, 158, 255, 0.15);
+    border: 1px solid rgba(74, 158, 255, 0.2);
+}
+
+[data-theme="dark"] .entropy-tooltip-content code {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(74, 158, 255, 0.3);
+}
+
+/* Light theme (светлый фон с синим градиентом) */
+[data-theme="light"] .entropy-tooltip {
+    background: linear-gradient(135deg, #4263eb 0%, #7950f2 100%);
+    box-shadow: 0 6px 20px rgba(66, 99, 235, 0.35);
+}
+
+[data-theme="light"] .entropy-tooltip-content {
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] .entropy-tooltip-content code {
+    background: rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Цветные фоны блока подсказки для каждой темы */
+[data-theme="original"] .entropy-note p {
+    background: rgba(102, 126, 234, 0.25);
+    border-left: 4px solid rgba(102, 126, 234, 0.7);
+}
+
+[data-theme="blue"] .entropy-note p {
+    background: rgba(2, 136, 209, 0.3);
+    border-left: 4px solid rgba(2, 136, 209, 0.8);
+}
+
+[data-theme="dark"] .entropy-note p {
+    background: rgba(74, 158, 255, 0.3);
+    border-left: 4px solid rgba(74, 158, 255, 0.7);
+}
+
+[data-theme="light"] .entropy-note p {
+    background: rgba(66, 99, 235, 0.2);
+    border-left: 4px solid rgba(66, 99, 235, 0.7);
+}
+
+/* Light theme overrides */
+[data-theme="light"] .entropy-info {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+[data-theme="light"] .entropy-value {
+    color: #4263eb;
+}
+
+[data-theme="light"] .pwned-status.safe {
+    --accent-color: hsl(127, 100%, 29%);
+    background: #d3f9d8;
+    border: 2px solid hsl(130, 57%, 56%);
+    color: var(--accent-color);
+}
+
+[data-theme="light"] .pwned-status.compromised {
+    background: #ffe0e0;
+    border: 2px solid #ff6b6b;
+    color: var(--accent-red);
+}

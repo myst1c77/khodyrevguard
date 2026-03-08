@@ -1,0 +1,82 @@
+/* =============================================
+   THEME SWITCHER — Виджет переключения тем
+   ============================================= */
+
+.theme-switcher {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    display: flex;
+    background: var(--theme-switcher-bg);
+    border-radius: 18px;
+    padding: 9px;
+    gap: 9px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+.theme-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    position: relative;
+}
+
+.theme-dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.theme-btn:hover {
+    transform: translateY(-2px);
+}
+
+.theme-btn:hover .theme-dot {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+
+.theme-btn.active .theme-dot {
+    border-color: var(--accent-blue);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px var(--accent-blue);
+}
+
+.theme-tooltip {
+    position: absolute;
+    bottom: -38px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.theme-btn:hover .theme-tooltip {
+    opacity: 1;
+}
+
+/* Цвета точек для каждой темы */
+.theme-btn[data-theme="original"] .theme-dot { background: linear-gradient(135deg, #667eea, #764ba2); }
+.theme-btn[data-theme="blue"] .theme-dot    { background: linear-gradient(135deg, #1e3a5f, #3b82f6); }
+.theme-btn[data-theme="dark"] .theme-dot    { background: linear-gradient(135deg, #111827, #374151); }
+.theme-btn[data-theme="light"] .theme-dot   { background: linear-gradient(135deg, #e5e7eb, #f9fafb); }

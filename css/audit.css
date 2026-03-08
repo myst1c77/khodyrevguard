@@ -1,0 +1,470 @@
+/* =============================================
+   AUDIT.CSS — Пакетный аудит паролей
+   ============================================= */
+
+/* ----- Trigger button ----- */
+
+.audit-trigger-section {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 28px;
+    margin: 0 0 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    transition: border-color 0.2s;
+}
+
+.audit-trigger-section:hover {
+    border-color: var(--accent-blue);
+}
+
+.btn-audit-trigger {
+    background: var(--gradient);
+    color: white;
+    padding: 13px 28px;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.audit-trigger-hint {
+    font-size: 0.97rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* ----- Overlay ----- */
+
+.audit-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.audit-overlay[hidden] {
+    display: none;
+}
+
+/* ----- Modal card ----- */
+
+.audit-modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 740px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 64px var(--shadow-color);
+    animation: auditSlideIn 0.22s ease;
+}
+
+@keyframes auditSlideIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ----- Modal header ----- */
+
+.audit-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.audit-modal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.audit-modal-title-row svg {
+    width: 20px;
+    height: 20px;
+    color: var(--accent-blue);
+    flex-shrink: 0;
+}
+
+.audit-modal-title-row h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.audit-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    transition: background 0.15s, color 0.15s;
+}
+
+.audit-close-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.audit-close-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* ----- Steps ----- */
+
+.audit-step {
+    padding: 20px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.audit-step[hidden] {
+    display: none;
+}
+
+@keyframes auditStepIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes auditStepOut {
+    from { opacity: 1; transform: scale(1); }
+    to   { opacity: 0; transform: scale(0.96); }
+}
+
+.audit-step-enter {
+    animation: auditStepIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.audit-step-exit {
+    animation: auditStepOut 0.28s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+}
+
+/* ----- Dropzone ----- */
+
+.audit-dropzone {
+    border: 2px dashed var(--border-color);
+    border-radius: 14px;
+    padding: 24px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.audit-dropzone:hover,
+.audit-dropzone.drag-over {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.04);
+}
+
+.audit-dropzone svg {
+    width: 32px;
+    height: 32px;
+    color: var(--accent-blue);
+    opacity: 0.8;
+}
+
+.audit-dropzone p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.audit-dropzone .btn {
+    padding: 11px 26px;
+    font-size: 0.93rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* ----- Divider ----- */
+
+.audit-or-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.audit-or-divider::before,
+.audit-or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+}
+
+/* ----- Textarea ----- */
+
+#auditTextarea {
+    width: 100%;
+    min-height: 110px;
+    max-height: 200px;
+    resize: vertical;
+    padding: 12px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+#auditTextarea:focus {
+    border-color: var(--accent-blue);
+}
+
+#auditTextarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+/* ----- Count hint ----- */
+
+.audit-count-hint {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin: -6px 0 0;
+    min-height: 18px;
+}
+
+.audit-count-hint.warn {
+    color: var(--accent-yellow);
+}
+
+/* ----- Mode selector ----- */
+
+.audit-mode-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.audit-mode-card {
+    cursor: pointer;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px 14px;
+    transition: border-color 0.2s, background 0.2s;
+    display: block;
+}
+
+.audit-mode-card:has(input:checked) {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.06);
+}
+
+[data-theme="light"] .audit-mode-card:has(input:checked) {
+    background: rgba(66, 99, 235, 0.06);
+}
+
+.audit-mode-card input[type="radio"] {
+    display: none;
+}
+
+.audit-mode-card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.audit-mode-card-content > svg {
+    width: 22px;
+    height: 22px;
+    color: var(--accent-blue);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.audit-mode-card-content > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.audit-mode-card-content strong {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.audit-mode-card-content span {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+}
+
+.audit-mode-card-content em {
+    font-size: 0.74rem;
+    font-style: normal;
+    color: var(--accent-blue);
+    opacity: 0.85;
+    margin-top: 2px;
+}
+
+/* ----- Start button ----- */
+
+.audit-start-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 13px;
+    font-size: 0.95rem;
+}
+
+.audit-start-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ----- Progress ----- */
+
+.audit-progress-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 0;
+}
+
+.audit-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    overflow: hidden;
+}
+
+.audit-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--gradient, var(--accent-blue));
+    transition: width 0.35s ease;
+    width: 0%;
+}
+
+#auditProgressText {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    text-align: center;
+}
+
+.audit-progress-sub {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+    text-align: center;
+    min-height: 18px;
+}
+
+/* ----- Done step ----- */
+
+#auditStep3 {
+    padding-top: 0;
+    gap: 10px;
+}
+
+.audit-done-icon {
+    text-align: center;
+    padding: 0 0 4px;
+}
+
+.audit-done-icon svg {
+    width: 48px;
+    height: 48px;
+    color: var(--accent-green);
+    opacity: 0;
+    transform: scale(0);
+}
+
+.audit-done-icon.animate svg {
+    animation: auditIconPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes auditIconPop {
+    from { opacity: 0; transform: scale(0); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.audit-done-text {
+    text-align: center;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.audit-download-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.audit-download-btns .btn {
+    flex: 1;
+    min-width: 140px;
+    justify-content: center;
+    padding: 11px 18px;
+    font-size: 0.88rem;
+}
+
+.audit-restart-btn {
+    width: 100%;
+    justify-content: center;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    padding: 10px;
+}
+
+.audit-restart-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+}
+
+/* ----- Responsive ----- */
+
+@media (max-width: 480px) {
+    .audit-modal {
+        border-radius: 16px;
+    }
+
+    .audit-mode-selector {
+        grid-template-columns: 1fr;
+    }
+
+    .audit-trigger-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}

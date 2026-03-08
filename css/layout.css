@@ -1,0 +1,243 @@
+/* =============================================
+   LAYOUT — Контейнер, шапка, навигация, карточки, советы
+   ============================================= */
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+header {
+    text-align: center;
+    padding: 30px 0 20px 0;
+    position: relative;
+}
+
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--gradient);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+h1 {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+}
+
+.nav-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 20px 0;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.nav-tab {
+    padding: 10px 20px;
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 100px;
+    justify-content: center;
+    font-family: inherit;
+    line-height: inherit;
+    text-align: center;
+    appearance: none;
+}
+
+.nav-tab i, .nav-tab svg.lucide {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.nav-tab:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-blue);
+}
+
+.nav-tab.active {
+    background: var(--gradient);
+    color: white;
+    border-color: transparent;
+}
+
+.page {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.page.active {
+    display: block;
+}
+
+.main-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: clamp(20px, 4vw, 40px);
+    box-shadow: 0 20px 60px var(--shadow-color);
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.page-title {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-title i, .page-title svg.lucide {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* ---- Tips Section ---- */
+
+.tips-section {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: clamp(20px, 4vw, 40px);
+    margin-bottom: 20px;
+}
+
+.tips-section h2 {
+    font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tips-section h2 svg.lucide {
+    width: 1.1em;
+    height: 1.1em;
+    flex-shrink: 0;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.tip-card {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.tip-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+.tip-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.tip-icon i, .tip-icon svg.lucide {
+    width: 28px;
+    height: 28px;
+    color: var(--accent-blue);
+}
+
+.tip-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+}
+
+.tip-description {
+    color: var(--text-secondary);
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    line-height: 1.5;
+}
+
+/* ---- Light theme overrides ---- */
+
+[data-theme="light"] body {
+    background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+[data-theme="light"] .logo-icon {
+    color: white;
+}
+
+[data-theme="light"] .nav-tab {
+    background: #ffffff;
+    border: 2px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .nav-tab:hover {
+    background: #f1f3f5;
+    border-color: var(--accent-blue);
+    box-shadow: 0 4px 8px rgba(66, 99, 235, 0.15);
+}
+
+[data-theme="light"] .nav-tab.active {
+    background: var(--gradient);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(66, 99, 235, 0.25);
+}
+
+[data-theme="light"] .main-card {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #dee2e6;
+}
+
+[data-theme="light"] .tips-section {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #dee2e6;
+}
+
+[data-theme="light"] .tip-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+[data-theme="light"] .tip-card:hover {
+    background: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    border-color: var(--accent-blue);
+}

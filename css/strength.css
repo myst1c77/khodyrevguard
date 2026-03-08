@@ -1,0 +1,449 @@
+/* =============================================
+   STRENGTH — Визуализация силы пароля, критерии, время взлома
+   ============================================= */
+
+/* ---- Strength Visualization ---- */
+
+.strength-visualization {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+.strength-visualization::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(59, 130, 246, 0.1) 0%,
+        transparent 50%);
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+}
+
+.strength-visualization:hover::before {
+    opacity: 1;
+}
+
+.strength-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.strength-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.strength-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    background: var(--bg-primary);
+    transition: background 0.3s ease;
+}
+
+.strength-icon i, .strength-icon svg.lucide {
+    width: 22px;
+    height: 22px;
+}
+
+.strength-icon.weak {
+    background: rgba(239, 68, 68, 0.1);
+    animation: shake 0.5s ease;
+}
+
+.strength-icon.medium {
+    background: rgba(245, 158, 11, 0.1);
+    animation: pulse 2s infinite;
+}
+
+.strength-icon.strong {
+    background: rgba(16, 185, 129, 0.1);
+    animation: bounce 0.5s ease;
+}
+
+.strength-icon.very-strong {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+    animation: glow 2s ease-in-out infinite;
+}
+
+.strength-text {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.strength-score-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.strength-score {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: bold;
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: background 0.3s ease;
+}
+
+.strength-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: fadeIn 0.3s ease;
+}
+
+.strength-badge.weak {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-red);
+}
+
+.strength-badge.medium {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--accent-yellow);
+}
+
+.strength-badge.strong {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--accent-green);
+}
+
+.strength-badge.very-strong {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+    color: var(--accent-blue);
+}
+
+/* ---- Strength Meter (4 сегмента) ---- */
+
+.strength-segments {
+    display: flex;
+    gap: 6px;
+    height: 12px;
+    margin-bottom: 15px;
+}
+
+.strength-segment {
+    flex: 1;
+    border-radius: 100px;
+    background: var(--border-color, rgba(100,100,100,0.3));
+    transition: background 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* 1 сегмент — красный (слабый, score < 40) */
+.strength-segments[data-active="1"] [data-seg="1"] {
+    background: #ef4444;
+    box-shadow: 0 0 8px #ef444466;
+}
+/* 2 сегмента — жёлтый (средний, score 40-69) */
+.strength-segments[data-active="2"] [data-seg="1"],
+.strength-segments[data-active="2"] [data-seg="2"] {
+    background: #f59e0b;
+    box-shadow: 0 0 8px #f59e0b66;
+}
+/* 3 сегмента — лайм (сильный, score 70-89) */
+.strength-segments[data-active="3"] [data-seg="1"],
+.strength-segments[data-active="3"] [data-seg="2"],
+.strength-segments[data-active="3"] [data-seg="3"] {
+    background: #84cc16;
+    box-shadow: 0 0 8px #84cc1666;
+}
+/* 4 сегмента — зелёный (очень сильный, score 90+) */
+.strength-segments[data-active="4"] .strength-segment {
+    background: #10b981;
+    box-shadow: 0 0 8px #10b98166;
+}
+
+/* ---- Strength Details ---- */
+
+.strength-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.strength-detail {
+    text-align: center;
+    padding: 10px;
+    background: var(--bg-primary);
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.strength-detail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.detail-value {
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: bold;
+    color: var(--accent-blue);
+    margin-bottom: 5px;
+}
+
+.detail-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ---- Strength Feedback ---- */
+
+.strength-feedback {
+    margin-top: 15px;
+    padding: 12px;
+    background: var(--bg-primary);
+    border-radius: 10px;
+    border-left: 4px solid var(--accent-blue);
+    animation: slideIn 0.3s ease;
+}
+
+.strength-feedback.weak {
+    border-left-color: var(--accent-red);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.strength-feedback.medium {
+    border-left-color: var(--accent-yellow);
+    background: rgba(245, 158, 11, 0.05);
+}
+
+.strength-feedback.strong {
+    border-left-color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.strength-feedback.very-strong {
+    border-left-color: var(--accent-blue);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+}
+
+.feedback-message {
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.feedback-suggestion {
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+    color: var(--text-secondary);
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* ---- Criteria Grid ---- */
+
+.criteria-grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.criterion {
+    background: var(--bg-secondary);
+    padding: 12px 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.3s ease, border-color 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.criterion.valid {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.criterion.invalid {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.criterion-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.criterion-icon i, .criterion-icon svg.lucide {
+    width: 18px;
+    height: 18px;
+}
+
+.criterion-text {
+    flex: 1;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+}
+
+.criterion-hint {
+    font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+    color: var(--text-secondary);
+    margin-top: 4px;
+    display: none;
+}
+
+.criterion.invalid .criterion-hint {
+    display: block;
+}
+
+/* ---- Crack Time Card ---- */
+
+.crack-time-card {
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.crack-time-danger {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    background: var(--crack-danger-bg, rgba(239, 68, 68, 0.08));
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.4s ease;
+}
+
+.crack-danger-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--crack-danger-icon-bg, rgba(239, 68, 68, 0.15));
+    color: var(--crack-danger-color, var(--accent-red));
+    flex-shrink: 0;
+    transition: background 0.4s ease, color 0.4s ease;
+}
+
+.crack-danger-icon svg { width: 24px; height: 24px; }
+
+.crack-danger-level {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--crack-danger-color, var(--accent-red));
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.4s ease;
+}
+
+.crack-danger-sublabel {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.crack-time-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--bg-secondary);
+}
+
+.crack-time-metric {
+    padding: 15px 20px;
+    border-right: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.crack-time-metric:last-child { border-right: none; }
+
+.crack-metric-label {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.crack-metric-label svg { width: 21px; height: 21px; }
+
+.crack-metric-value {
+    font-size: clamp(1.1rem, 2.94vw, 1.54rem);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: color 0.3s ease;
+}
+
+.crack-metric-value svg { width: 18px; height: 18px; }
+
+/* ---- Light theme overrides ---- */
+
+[data-theme="light"] .strength-segment {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .strength-visualization {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+[data-theme="light"] .strength-icon {
+    background: white;
+}
+
+[data-theme="light"] .strength-detail {
+    background: white;
+    border: 1px solid #e9ecef;
+}
+
+[data-theme="light"] .strength-feedback {
+    background: white;
+    border: 1px solid #e9ecef;
+}
+
+[data-theme="light"] .crack-time-card {
+    border-color: #dee2e6;
+}
+
+[data-theme="light"] .criterion {
+    background: #f8f9fa;
+    border: 2px solid transparent;
+}
+
+[data-theme="light"] .criterion.valid {
+    background: #d3f9d8;
+    border-color: #51cf66;
+}
+
+[data-theme="light"] .criterion.invalid {
+    background: #ffe0e0;
+    border-color: #ff6b6b;
+}
