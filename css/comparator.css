@@ -1,0 +1,402 @@
+/* =============================================
+   COMPARATOR — Сравнитель паролей ("Дуэль карточек")
+   ============================================= */
+
+.comparator-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+/* ---- Arena layout ---- */
+.comparator-arena {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+}
+
+/* ---- Card ---- */
+.comparator-card {
+    flex: 1;
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 30px;
+    border: 2px solid transparent;
+    transition: border-color 0.35s ease, box-shadow 0.35s ease, opacity 0.35s ease;
+    position: relative;
+    min-width: 0;
+}
+
+.comparator-card.winner {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 22px rgba(16, 185, 129, 0.18);
+}
+
+.comparator-card.loser {
+    opacity: 0.68;
+}
+
+/* Card label */
+.comp-card-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+/* ---- Input ---- */
+.comp-input-wrap {
+    position: relative;
+    margin-bottom: 22px;
+}
+
+.comp-input-wrap .password-input {
+    padding-right: 44px;
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.comp-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.comp-toggle:hover {
+    color: var(--text-primary);
+}
+
+.comp-toggle i, .comp-toggle svg.lucide {
+    width: 18px;
+    height: 18px;
+}
+
+/* ---- Strength header ---- */
+.comp-strength-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.comp-strength-text {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.comp-strength-score {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+    padding: 3px 12px;
+    border-radius: 20px;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.28);
+}
+
+[data-theme="light"] .comp-strength-score {
+    box-shadow: 0 0 0 2px rgba(66, 99, 235, 0.5);
+}
+
+/* ---- Criteria grid ---- */
+.comp-criteria-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px 12px;
+    margin: 22px 0;
+}
+
+.comp-criterion {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+    padding: 7px 0;
+}
+
+.comp-criterion-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.comp-criterion-icon i, .comp-criterion-icon svg.lucide {
+    width: 13px;
+    height: 13px;
+}
+
+.comp-criterion.valid {
+    color: var(--accent-green);
+}
+
+.comp-criterion.valid .comp-criterion-icon {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-green);
+}
+
+.comp-criterion.invalid {
+    color: var(--text-secondary);
+}
+
+.comp-criterion.invalid .comp-criterion-icon {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--accent-red);
+}
+
+/* ---- Stats row ---- */
+.comp-stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 26px;
+}
+
+.comp-stat {
+    flex: 1;
+    text-align: center;
+    background: var(--bg-primary);
+    border-radius: 10px;
+    padding: 18px 12px;
+    min-width: 0;
+}
+
+.comp-stat-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    white-space: nowrap;
+    gap: 4px;
+}
+
+.comp-stat-value i, .comp-stat-value svg.lucide {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.comp-stat-label {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    white-space: nowrap;
+}
+
+/* ---- Winner badge ---- */
+.comp-winner-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--gradient);
+    color: white;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+}
+
+/* Фикс: CSS display:flex перебивает UA-стиль от атрибута hidden */
+.comp-winner-badge[hidden] {
+    display: none !important;
+}
+
+.comp-winner-badge i, .comp-winner-badge svg.lucide {
+    width: 14px;
+    height: 14px;
+}
+
+/* ---- VS divider ---- */
+.comparator-vs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 32px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.comparator-vs-line {
+    width: 2px;
+    flex: 1;
+    background: var(--border-color);
+    border-radius: 2px;
+    min-height: 20px;
+}
+
+/* ---- Verdict ---- */
+.comparator-verdict {
+    background: var(--bg-secondary);
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin-top: 16px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    transition: border-color 0.3s;
+}
+
+.comparator-verdict.verdict-a,
+.comparator-verdict.verdict-b {
+    border-color: var(--accent-green);
+}
+
+.comparator-verdict.verdict-tie {
+    border-color: var(--accent-blue);
+}
+
+.comparator-verdict-icon {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.comparator-verdict-icon i, .comparator-verdict-icon svg.lucide {
+    width: 28px;
+    height: 28px;
+}
+
+.comparator-verdict-text {
+    font-size: 1.24rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.comparator-verdict-sub {
+    font-size: 1.04rem;
+    color: var(--text-secondary);
+}
+
+/* ---- HIBP indicator ---- */
+.comp-pwned {
+    margin-top: 14px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border-radius: 8px;
+}
+
+.comp-pwned.safe        { color: var(--accent-green); background: rgba(16, 185, 129, 0.1); }
+.comp-pwned.compromised { color: var(--accent-red);   background: rgba(239, 68, 68, 0.1); }
+
+.comp-pwned i, .comp-pwned svg.lucide { width: 18px; height: 18px; }
+
+.comp-pwned[hidden] { display: none !important; }
+
+[data-theme="light"] .comp-pwned.safe {
+    color: #087f5b;
+    background: rgba(8, 127, 91, 0.15);
+}
+[data-theme="light"] .comp-pwned.compromised {
+    color: var(--accent-red);
+    background: rgba(224, 49, 49, 0.15);
+}
+
+/* ---- Dark-theme input visibility ---- */
+/* Карточка = --bg-secondary, инпут тоже был --bg-secondary → сливались.
+   Переключаем на --bg-primary (темнее) + полупрозрачная рамка для контраста. */
+[data-theme="original"] .comp-input-wrap .password-input,
+[data-theme="blue"]     .comp-input-wrap .password-input,
+[data-theme="dark"]     .comp-input-wrap .password-input {
+    background: var(--bg-primary);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+[data-theme="original"] .comp-input-wrap .password-input:focus,
+[data-theme="blue"]     .comp-input-wrap .password-input:focus,
+[data-theme="dark"]     .comp-input-wrap .password-input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 640px) {
+    .comparator-arena {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .comparator-vs {
+        flex-direction: row;
+        min-width: unset;
+        min-height: 24px;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .comparator-vs-line {
+        width: auto;
+        height: 2px;
+        flex: 1;
+        min-height: unset;
+    }
+
+    .comp-winner-badge {
+        top: 10px;
+        right: 10px;
+    }
+}
+
+/* ---- Shield icon accent colors (all themes) ---- */
+.comparator-card .strength-icon.weak        { color: var(--accent-red); }
+.comparator-card .strength-icon.medium      { color: var(--accent-yellow); }
+.comparator-card .strength-icon.strong      { color: var(--accent-green); }
+.comparator-card .strength-icon.very-strong { color: var(--accent-blue); }
+
+/* ---- Light theme: stronger criterion colors ---- */
+[data-theme="light"] .comp-criterion.valid {
+    color: #087f5b;
+}
+[data-theme="light"] .comp-criterion.valid .comp-criterion-icon {
+    background: rgba(8, 127, 91, 0.18);
+    color: #087f5b;
+}
+[data-theme="light"] .comp-criterion.invalid {
+    color: var(--accent-red);
+}
+[data-theme="light"] .comp-criterion.invalid .comp-criterion-icon {
+    background: rgba(224, 49, 49, 0.18);
+    color: var(--accent-red);
+}

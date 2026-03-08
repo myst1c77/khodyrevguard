@@ -1,0 +1,174 @@
+/* =============================================
+   EXPORT — Секция экспорта и выпадающее меню
+   ============================================= */
+
+.export-section {
+    margin-top: 25px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.btn-export {
+    width: 100%;
+    padding: 14px 22px;
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    font-weight: 600;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+}
+
+.btn-export:hover {
+    background: var(--bg-card);
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+}
+
+.btn-export .export-icon {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.btn-export .export-icon i, .btn-export .export-icon svg.lucide {
+    width: 20px;
+    height: 20px;
+}
+
+.dropdown-arrow i, .dropdown-arrow svg.lucide {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-export .dropdown-arrow {
+    margin-left: 5px;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.export-section:has(#exportDropdown.open) .dropdown-arrow { transform: rotate(180deg); }
+
+.export-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px var(--shadow-color);
+    z-index: 100;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.export-dropdown.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.export-option {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.export-option:last-child {
+    border-bottom: none;
+}
+
+.export-option:hover {
+    background: rgba(59, 130, 246, 0.1);
+    transform: translateX(5px);
+}
+
+.export-option:active {
+    transform: translateX(3px);
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.export-option .export-icon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.export-option:hover .export-icon {
+    transform: scale(1.1);
+    background: rgba(59, 130, 246, 0.2);
+}
+
+.export-option .export-icon i, .export-option .export-icon svg.lucide {
+    width: 22px;
+    height: 22px;
+}
+
+.export-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.export-name {
+    font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.export-desc {
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    color: var(--text-secondary);
+}
+
+/* ---- Light theme overrides ---- */
+
+[data-theme="light"] .export-dropdown {
+    border: 2px solid #dee2e6;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .export-option {
+    border-bottom: 1px solid #e9ecef;
+}
+
+[data-theme="light"] .export-option:hover {
+    background: #f1f3f5;
+}
+
+[data-theme="light"] .export-option:active {
+    background: #e9ecef;
+}
+
+[data-theme="light"] .export-option .export-icon {
+    background: white;
+    border: 1px solid #e9ecef;
+}
+
+[data-theme="light"] .export-option:hover .export-icon {
+    background: #e7f1ff;
+    border-color: #4263eb;
+}
