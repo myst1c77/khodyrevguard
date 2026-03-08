@@ -80,3 +80,35 @@
 .theme-btn[data-theme="blue"] .theme-dot    { background: linear-gradient(135deg, #1e3a5f, #3b82f6); }
 .theme-btn[data-theme="dark"] .theme-dot    { background: linear-gradient(135deg, #111827, #374151); }
 .theme-btn[data-theme="light"] .theme-dot   { background: linear-gradient(135deg, #e5e7eb, #f9fafb); }
+
+/* === Sidebar-embedded variant — overrides fixed positioning === */
+.sidebar-theme-switcher {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    z-index: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 4px 2px !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px !important;
+}
+
+.sidebar-theme-switcher .theme-btn {
+    width: 36px;
+    height: 36px;
+}
+
+.sidebar-theme-switcher .theme-dot {
+    width: 20px;
+    height: 20px;
+}
+
+/* Tooltip direction: sideways since sidebar is narrow */
+.sidebar-theme-switcher .theme-tooltip {
+    bottom: auto;
+    top: -34px;
+    left: 50%;
+}
