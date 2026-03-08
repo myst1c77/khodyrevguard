@@ -1087,5 +1087,29 @@
 
         </div>
     </div>
+    <!-- Mobile Bottom Navigation (только телефоны, скрыто на десктопе через CSS) -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav" role="navigation" aria-label="Навигация">
+        <button type="button" class="sidebar-item mobile-nav-item active"
+                data-page="analyzer" role="tab" aria-selected="true" aria-controls="analyzerPage">
+            <i data-lucide="shield-check"></i>
+            <span class="mobile-nav-label">Анализ</span>
+        </button>
+        <button type="button" class="sidebar-item mobile-nav-item"
+                data-page="comparator" role="tab" aria-selected="false" aria-controls="comparatorPage">
+            <i data-lucide="git-compare"></i>
+            <span class="mobile-nav-label">Сравнение</span>
+        </button>
+        <button type="button" class="sidebar-item mobile-nav-item"
+                data-page="generator" role="tab" aria-selected="false" aria-controls="generatorPage">
+            <i data-lucide="shuffle"></i>
+            <span class="mobile-nav-label">Генератор</span>
+        </button>
+        <button type="button" class="sidebar-item mobile-nav-item"
+                data-page="hasher" role="tab" aria-selected="false" aria-controls="hasherPage">
+            <i data-lucide="key-round"></i>
+            <span class="mobile-nav-label">Хеш</span>
+        </button>
+    </nav>
+
 </body>
 </html>
