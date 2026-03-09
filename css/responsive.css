@@ -355,19 +355,29 @@
     }
 
     .mutator-original-stats {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        align-items: start;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: stretch;
     }
 
     .mutator-original-password {
-        grid-column: span 2;
+        flex: 0 0 100%;
         max-width: 100%;
     }
 
+    .mutator-orig-stat {
+        flex: 0 0 calc(50% - 4px);
+        min-width: 0;
+        background: var(--bg-primary);
+        border-radius: 8px;
+        padding: 8px 10px;
+        align-items: flex-start;
+        border: 1px solid var(--border-color);
+    }
+
     .mutator-hibp {
-        grid-column: span 2;
+        flex: 0 0 100%;
     }
 
     .mutator-stats-row {
