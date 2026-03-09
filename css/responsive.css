@@ -236,6 +236,10 @@
     /* Status bar: reduce side padding */
     .status-bar { padding: 0 12px; }
 
+    /* Theme switcher in status bar — mobile only */
+    .statusbar-theme-switcher { display: flex !important; }
+    .status-counters { display: none; }
+
     /* iOS safe area support */
     body { padding-bottom: env(safe-area-inset-bottom); }
 }
