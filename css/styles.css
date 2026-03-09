@@ -1,0 +1,21 @@
+/* =============================================
+   styles.css — точка входа, только импорты
+   index.html подключает этот файл.
+   Порядок важен: анимации перед компонентами,
+   responsive — последним.
+   ============================================= */
+
+@import "base.css";
+@import "animations.css";
+@import "theme-switcher.css";
+@import "layout.css";
+@import "buttons.css";
+@import "forms.css";
+@import "strength.css";
+@import "hasher.css";
+@import "generator.css";
+@import "entropy.css";
+@import "export.css";
+@import "notifications.css";
+@import "responsive.css";
+@import "mobile.css";

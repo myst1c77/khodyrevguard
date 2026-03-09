@@ -1,0 +1,126 @@
+/* =============================================
+   LAYOUT — Карточки, страницы, советы
+   (Навигация, шапка и контейнер перенесены в sidebar.css)
+   ============================================= */
+
+.page {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.page.active {
+    display: block;
+}
+
+.main-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: clamp(20px, 4vw, 40px);
+    box-shadow: 0 20px 60px var(--shadow-color);
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.page-title {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-title i, .page-title svg.lucide {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* ---- Tips Section ---- */
+
+.tips-section {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: clamp(20px, 4vw, 40px);
+    margin-bottom: 20px;
+}
+
+.tips-section h2 {
+    font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tips-section h2 svg.lucide {
+    width: 1.1em;
+    height: 1.1em;
+    flex-shrink: 0;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.tip-card {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.tip-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+.tip-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.tip-icon i, .tip-icon svg.lucide {
+    width: 28px;
+    height: 28px;
+    color: var(--accent-blue);
+}
+
+.tip-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+}
+
+.tip-description {
+    color: var(--text-secondary);
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    line-height: 1.5;
+}
+
+/* ---- Light theme overrides ---- */
+
+[data-theme="light"] .main-card {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #dee2e6;
+}
+
+[data-theme="light"] .tips-section {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #dee2e6;
+}
+
+[data-theme="light"] .tip-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+[data-theme="light"] .tip-card:hover {
+    background: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    border-color: var(--accent-blue);
+}

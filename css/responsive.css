@@ -1,0 +1,402 @@
+/* =============================================
+   RESPONSIVE — Адаптивные стили и начальные скрытые состояния
+   ============================================= */
+
+/* ---- Mobile (max 767px): sidebar hidden, hamburger visible ---- */
+
+@media (max-width: 767px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        height: 100vh;
+        transform: translateX(-100%);
+        z-index: 200;
+        width: 260px;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .hamburger-btn {
+        display: flex;
+    }
+
+    .content-area {
+        padding: 12px;
+    }
+
+    .info-cards-row {
+        grid-template-columns: 1fr;
+    }
+
+    .inspector-panel {
+        display: none !important;
+    }
+
+    .content-area.has-inspector {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---- Tablet (768px–1023px): icon-only sidebar ---- */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .sidebar {
+        width: 60px;
+    }
+
+    .sidebar-brand,
+    .sidebar-label {
+        display: none;
+    }
+
+    .sidebar-item {
+        justify-content: center;
+        padding: 10px;
+        gap: 0;
+    }
+
+    .sidebar-theme-switcher {
+        flex-direction: column;
+        gap: 4px !important;
+    }
+
+    .content-area {
+        padding: 16px;
+    }
+}
+
+/* ---- Mobile common (max 768px) ---- */
+
+@media (max-width: 768px) {
+    .main-card {
+        padding: 15px;
+        border-radius: 15px;
+    }
+
+    /* Strength visualization mobile optimization */
+    .strength-visualization {
+        padding: 15px;
+    }
+
+    .strength-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+    }
+
+    .strength-details {
+        gap: 8px;
+    }
+
+    .strength-detail {
+        padding: 8px;
+    }
+
+    .detail-value {
+        font-size: 16px;
+    }
+
+    .detail-label {
+        font-size: 10px;
+    }
+
+    .tips-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .hash-algorithms {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .format-options {
+        justify-content: space-between;
+    }
+
+    .format-option {
+        flex: 0 0 calc(33% - 5px);
+        min-width: auto;
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+
+    .hash-copy-btn-single {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+
+    .entropy-info {
+        padding: 12px;
+    }
+
+    .criterion {
+        padding: 10px 12px;
+    }
+
+    .criterion-icon {
+        font-size: 16px;
+    }
+
+    .generator-buttons {
+        width: 100%;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+
+    /* Prevent horizontal scroll */
+    body {
+        overflow-x: hidden;
+    }
+
+    /* Fix password input on mobile */
+    .password-input,
+    .hasher-textarea {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    /* Adjust sliders for touch */
+    .slider::-webkit-slider-thumb {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    .slider::-moz-range-thumb {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    /* Better touch targets */
+    .algorithm-btn,
+    .nav-tab,
+    .btn,
+    .checkbox-group {
+        min-height: 44px;
+    }
+
+    /* Optimize generated password display */
+    .generated-password {
+        font-size: 1.1rem;
+        padding: 12px 8px;
+        letter-spacing: 0;
+    }
+
+    /* Export section mobile optimization */
+    .export-section {
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+
+    .export-option {
+        padding: 12px 15px;
+    }
+
+    .export-option .export-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+
+    .export-name {
+        font-size: 0.95rem;
+    }
+
+    .export-desc {
+        font-size: 0.75rem;
+    }
+
+    /* Comparator: reduce card padding, criteria 1-col, stats text wrap */
+    .comparator-card { padding: 16px; }
+    .comp-criteria-grid { grid-template-columns: 1fr; }
+    .comp-stat-value { font-size: 0.85rem; white-space: normal; }
+    .comp-stat-label { font-size: 0.8rem; white-space: normal; }
+
+    /* Strength: cap details at 2 columns */
+    .strength-details { grid-template-columns: repeat(2, 1fr); }
+
+    /* Crack card: smaller danger icon */
+    .crack-danger-icon { width: 36px; height: 36px; }
+    .crack-danger-icon svg { width: 20px; height: 20px; }
+
+    /* Generator: reduce container padding */
+    .generated-password-container { padding: 16px; }
+    .batch-count-selector { padding-right: 0; flex-wrap: wrap; }
+
+    /* Memorability hint: tighter on mobile */
+    .memorability-hint { padding: 14px; gap: 10px; }
+
+    /* Status bar: reduce side padding */
+    .status-bar { padding: 0 12px; }
+
+    /* iOS safe area support */
+    body { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+/* ---- Small mobile (max 480px) ---- */
+
+@media (max-width: 480px) {
+    .hash-algorithms {
+        grid-template-columns: 1fr;
+    }
+
+    .entropy-stat {
+        min-width: 70px;
+    }
+
+    .tips-section {
+        padding: 15px;
+    }
+
+    .tip-card {
+        padding: 15px;
+    }
+
+    /* Tighter content area */
+    .content-area { padding: 8px; }
+    .main-card { padding: 12px; border-radius: 12px; }
+
+    /* Comparator cards: tighter */
+    .comparator-card { padding: 12px; }
+    .comp-stats { flex-direction: column; gap: 6px; }
+    .comp-stat { padding: 10px 12px; }
+
+    /* Format options: 2 columns instead of 3 */
+    .format-option { flex: 0 0 calc(50% - 5px); }
+
+    /* Generator batch: wrap buttons on tiny screens */
+    .batch-count-options { flex-wrap: wrap; justify-content: center; }
+    .batch-count-selector { flex-direction: column; gap: 6px; align-items: flex-start; }
+
+    /* Generator buttons: stack vertically */
+    .generator-buttons { flex-direction: column; }
+    .generator-buttons .btn { width: 100%; }
+
+    /* Strength visualization: tighter */
+    .strength-visualization { padding: 12px; }
+    .crack-time-danger { padding: 12px 14px; gap: 10px; }
+    .crack-danger-icon { width: 32px; height: 32px; }
+    .crack-danger-icon svg { width: 18px; height: 18px; }
+    .crack-metric-label { font-size: 0.9rem; gap: 5px; }
+    .crack-metric-label svg { width: 16px; height: 16px; }
+
+    /* Status bar: condensed */
+    .status-bar { padding: 0 8px; }
+    .status-page-title { font-size: 0.88rem; }
+    .status-bar-right { font-size: 0.72rem; }
+}
+
+/* ---- Very small phones (max 360px) ---- */
+
+@media (max-width: 360px) {
+    .content-area { padding: 6px; }
+    .main-card { padding: 10px; }
+    .status-page-title {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .batch-count-btn { width: 32px; height: 32px; font-size: 0.85rem; }
+    .separator-selector { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ---- Landscape mobile optimization ---- */
+
+@media (max-width: 767px) and (orientation: landscape) {
+    .main-card {
+        padding: 15px;
+    }
+}
+
+/* ---- Начальные скрытые состояния (управляются JS) ----
+   ID-селекторы (1,0,0) имеют приоритет над классами (0,1,0),
+   поэтому этот блок безопасно размещать последним. */
+
+#strengthBadge,
+#strengthDetails,
+#strengthFeedback,
+#timeToCrack,
+#timeToCrackZxcvbn,
+#entropyInfo,
+#crackTimeCard,
+#exportSection,
+#passphraseControls,
+#passphraseMemorabilityInfo,
+#hashResultContainer { display: none; }
+
+/* ---- Mutator responsive ---- */
+
+@media (max-width: 767px) {
+    .mutator-input-wrap {
+        flex-direction: column;
+    }
+
+    #mutatorMutateBtn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .mutator-results {
+        grid-template-columns: 1fr !important;
+    }
+
+    .mutator-variant-card,
+    .mutator-variant-card:nth-child(4),
+    .mutator-variant-card:nth-child(5) {
+        grid-column: span 1 !important;
+    }
+
+    .mutator-original-stats {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .mutator-original-password {
+        max-width: 100%;
+    }
+
+    .mutator-stats-row {
+        gap: 5px;
+    }
+
+    .mutator-stat {
+        padding: 7px 5px;
+    }
+
+    .mutator-stat-value {
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .mutator-variant-card {
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .mutator-password-display {
+        font-size: 0.82rem;
+        padding: 8px 10px;
+    }
+
+    .mutator-stat {
+        padding: 6px 4px;
+    }
+
+    .mutator-stat-label {
+        font-size: 0.6rem;
+    }
+
+    .mutator-original-section {
+        padding: 12px 14px;
+    }
+}
