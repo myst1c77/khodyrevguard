@@ -271,6 +271,14 @@
     min-width: 0;
 }
 
+/* Mobile inline criteria section (hidden on desktop) */
+.mobile-criteria-section {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 16px;
+}
+
 .inspector-header {
     display: flex;
     align-items: center;
