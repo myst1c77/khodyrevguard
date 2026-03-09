@@ -450,3 +450,9 @@
     border-color: #ced4da;
 }
 
+@media (min-width: 1024px) {
+    .sidebar-brand {
+        cursor: pointer;
+    }
+}
+
