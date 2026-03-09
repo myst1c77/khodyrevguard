@@ -125,6 +125,7 @@
     padding: 0 !important;
     gap: 4px !important;
     display: none;
+    margin-left: auto;
 }
 
 .statusbar-theme-switcher .theme-btn {
