@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="css/export.css">
     <link rel="stylesheet" href="css/audit.css">
     <link rel="stylesheet" href="css/comparator.css">
+    <link rel="stylesheet" href="css/mutator.css">
     <link rel="stylesheet" href="css/notifications.css">
     <link rel="stylesheet" href="css/sidebar.css">
     <link rel="stylesheet" href="css/responsive.css">
@@ -48,6 +49,10 @@
                 <button type="button" class="sidebar-item" data-page="comparator" role="tab" aria-selected="false" aria-controls="comparatorPage">
                     <i data-lucide="git-compare"></i>
                     <span class="sidebar-label">Сравнитель</span>
+                </button>
+                <button type="button" class="sidebar-item" data-page="mutator" role="tab" aria-selected="false" aria-controls="mutatorPage">
+                    <i data-lucide="wand-2"></i>
+                    <span class="sidebar-label">Мутатор</span>
                 </button>
                 <button type="button" class="sidebar-item" data-page="generator" role="tab" aria-selected="false" aria-controls="generatorPage">
                     <i data-lucide="shuffle"></i>
@@ -555,6 +560,83 @@
             </div>
         </div>
 
+        <!-- Mutator Page -->
+        <div id="mutatorPage" class="page">
+            <div class="main-card">
+                <h2 class="page-title"><i data-lucide="wand-2"></i> Мутатор паролей</h2>
+                <p class="comparator-subtitle">Введите слабый пароль — получите 5 укреплённых вариантов с проверкой утечек</p>
+
+                <!-- Input section -->
+                <div class="mutator-input-section">
+                    <div class="mutator-input-wrap">
+                        <div class="password-input-container" style="flex:1; min-width:0;">
+                            <input type="password" id="mutatorInput" class="password-input"
+                                placeholder="Введите пароль для мутации..." autocomplete="off">
+                            <button class="toggle-visibility" id="mutatorToggleBtn" aria-label="Показать пароль">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-primary" id="mutatorMutateBtn">
+                            <i data-lucide="wand-2"></i><span>Мутировать</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="mutatorPatternTag" class="mutator-pattern-tag" style="display:none;">
+                    <i data-lucide="tag"></i><span id="mutatorPatternLabel">—</span>
+                </div>
+
+                <!-- Original "Before" reference bar -->
+                <div class="mutator-original-section" id="mutatorOriginalSection" style="display:none;">
+                    <div class="mutator-original-label">Исходный пароль — до мутации</div>
+                    <div class="mutator-original-stats">
+                        <span class="mutator-original-password" id="mutatorOrigPassword" title="">—</span>
+                        <div class="mutator-orig-stat">
+                            <span class="mutator-orig-stat-value" id="mutatorOrigScore">—</span>
+                            <span class="mutator-orig-stat-label">Оценка</span>
+                        </div>
+                        <div class="mutator-orig-stat">
+                            <span class="mutator-orig-stat-value" id="mutatorOrigEntropy">—</span>
+                            <span class="mutator-orig-stat-label">Энтропия</span>
+                        </div>
+                        <div class="mutator-orig-stat">
+                            <span class="mutator-orig-stat-value" id="mutatorOrigCrackTime">—</span>
+                            <span class="mutator-orig-stat-label">Взлом</span>
+                        </div>
+                        <div class="mutator-orig-stat">
+                            <span class="mutator-orig-stat-value" id="mutatorOrigCrackTimeZxcvbn">—</span>
+                            <span class="mutator-orig-stat-label">Взлом zxcvbn</span>
+                        </div>
+                        <div class="mutator-hibp" id="mutatorOrigHIBP"></div>
+                    </div>
+                </div>
+
+                <!-- 5 variant cards rendered by JS -->
+                <div class="mutator-results" id="mutatorResults" style="display:none;"></div>
+            </div>
+
+            <div class="tips-section">
+                <h2><i data-lucide="lightbulb"></i> Как работает мутатор</h2>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon"><i data-lucide="eye"></i></div>
+                        <div class="tip-title">Узнаваемость</div>
+                        <div class="tip-description">Структура пароля сохраняется — слово остаётся читаемым, но становится значительно сложнее для взлома.</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon"><i data-lucide="shield-check"></i></div>
+                        <div class="tip-title">Проверка утечек</div>
+                        <div class="tip-description">Каждый вариант проверяется в базе Have I Been Pwned — вы сразу видите, был ли он скомпрометирован.</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon"><i data-lucide="flask-conical"></i></div>
+                        <div class="tip-title">5 рецептов</div>
+                        <div class="tip-description">Под каждый тип пароля — разные стратегии: leet-замены, смешанный регистр, символы-разделители и обфускация цифр.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Generator Page -->
         <div id="generatorPage" class="page">
             <div class="main-card">
@@ -1003,6 +1085,7 @@
     <script src="js/ui/export.js"></script>
     <script src="js/ui/charts.js"></script>
     <script src="js/core/comparator.js"></script>
+    <script src="js/core/mutator.js"></script>
     <script src="js/app.js"></script>
     <script src="js/ui/audit.js"></script>
 
@@ -1099,6 +1182,11 @@
                 data-page="comparator" role="tab" aria-selected="false" aria-controls="comparatorPage">
             <i data-lucide="git-compare"></i>
             <span class="mobile-nav-label">Сравнение</span>
+        </button>
+        <button type="button" class="sidebar-item mobile-nav-item"
+                data-page="mutator" role="tab" aria-selected="false" aria-controls="mutatorPage">
+            <i data-lucide="wand-2"></i>
+            <span class="mobile-nav-label">Мутатор</span>
         </button>
         <button type="button" class="sidebar-item mobile-nav-item"
                 data-page="generator" role="tab" aria-selected="false" aria-controls="generatorPage">
