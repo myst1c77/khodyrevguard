@@ -96,16 +96,16 @@
                     </button>
                     <span class="status-page-title" id="statusPageTitle">Анализатор</span>
                 </div>
+                <div class="theme-switcher statusbar-theme-switcher">
+                    <button class="theme-btn" data-theme="original" title="Оригинальная" onclick="switchTheme('original')"><span class="theme-dot"></span></button>
+                    <button class="theme-btn" data-theme="blue" title="Синяя" onclick="switchTheme('blue')"><span class="theme-dot"></span></button>
+                    <button class="theme-btn" data-theme="dark" title="Тёмная" onclick="switchTheme('dark')"><span class="theme-dot"></span></button>
+                    <button class="theme-btn" data-theme="light" title="Светлая" onclick="switchTheme('light')"><span class="theme-dot"></span></button>
+                </div>
                 <div class="status-bar-right">
-                    <div class="theme-switcher statusbar-theme-switcher">
-                        <button class="theme-btn" data-theme="original" title="Оригинальная" onclick="switchTheme('original')"><span class="theme-dot"></span></button>
-                        <button class="theme-btn" data-theme="blue" title="Синяя" onclick="switchTheme('blue')"><span class="theme-dot"></span></button>
-                        <button class="theme-btn" data-theme="dark" title="Тёмная" onclick="switchTheme('dark')"><span class="theme-dot"></span></button>
-                        <button class="theme-btn" data-theme="light" title="Светлая" onclick="switchTheme('light')"><span class="theme-dot"></span></button>
-                    </div>
-                    <span class="status-counters">Проверено: <strong id="analyzedCountEl">0</strong>
+                    Проверено: <strong id="analyzedCountEl">0</strong>
                     &nbsp;|&nbsp;
-                    Сгенерировано: <strong id="generatedCountEl">0</strong></span>
+                    Сгенерировано: <strong id="generatedCountEl">0</strong>
                 </div>
             </header>
 
