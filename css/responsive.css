@@ -376,7 +376,7 @@
         border: 1px solid var(--border-color);
     }
 
-    .mutator-hibp {
+    .mutator-original-stats .mutator-hibp {
         flex: 0 0 100%;
     }
 
