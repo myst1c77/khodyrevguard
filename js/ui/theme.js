@@ -3,7 +3,7 @@ const THEME_COLORS = { light: '#f8f9fa', dark: '#0d0d0d', original: '#0a0e27', b
 
 let currentTheme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', currentTheme);
-document.querySelector(`.theme-btn[data-theme="${currentTheme}"]`).classList.add('active');
+document.querySelectorAll(`.theme-btn[data-theme="${currentTheme}"]`).forEach(btn => btn.classList.add('active'));
 document.getElementById('themeColorMeta').setAttribute('content', THEME_COLORS[currentTheme] || '#f8f9fa');
 
 function switchTheme(theme) {
@@ -15,5 +15,5 @@ function switchTheme(theme) {
     document.querySelectorAll('.theme-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    document.querySelector(`.theme-btn[data-theme="${theme}"]`).classList.add('active');
+    document.querySelectorAll(`.theme-btn[data-theme="${theme}"]`).forEach(btn => btn.classList.add('active'));
 }
