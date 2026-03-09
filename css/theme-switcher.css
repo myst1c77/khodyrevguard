@@ -112,3 +112,31 @@
     top: -34px;
     left: 50%;
 }
+
+/* === Status-bar embedded variant — shown on mobile === */
+.statusbar-theme-switcher {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    z-index: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    gap: 4px !important;
+    display: none;
+}
+
+.statusbar-theme-switcher .theme-btn {
+    width: 28px;
+    height: 28px;
+}
+
+.statusbar-theme-switcher .theme-dot {
+    width: 18px;
+    height: 18px;
+}
+
+.statusbar-theme-switcher .theme-tooltip {
+    display: none;
+}
