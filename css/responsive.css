@@ -37,6 +37,10 @@
         display: none;
     }
 
+    .mobile-criteria-section {
+        display: flex;
+    }
+
     .inspector-panel {
         display: none !important;
     }
