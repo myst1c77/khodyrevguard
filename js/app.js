@@ -94,6 +94,9 @@
             const inspectorPanel = document.getElementById('inspectorPanel');
             if (page === 'analyzer') {
                 contentArea?.classList.add('has-inspector');
+                if (AppState.lastAnalysisResults !== null) {
+                    inspectorPanel?.classList.add('visible');
+                }
             } else {
                 contentArea?.classList.remove('has-inspector');
                 inspectorPanel?.classList.remove('visible');
@@ -269,6 +272,9 @@
 
         // Initialize generator on first load
         document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('passwordInput').value = '';
+            resetAnalysis();
+
             // generateCustomPassword(); // Убрана автогенерация при загрузке страницы
 
             // Initialize hasher event listeners
@@ -423,4 +429,14 @@
 
             // Initial Lucide icon render
             if (window.lucide) lucide.createIcons();
+
+            // Reload page on brand click (desktop only)
+            const sidebarBrand = document.querySelector('.sidebar-brand');
+            if (sidebarBrand) {
+                sidebarBrand.addEventListener('click', () => {
+                    if (window.matchMedia('(min-width: 1024px)').matches) {
+                        location.reload();
+                    }
+                });
+            }
         });
