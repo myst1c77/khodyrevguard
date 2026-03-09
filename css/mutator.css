@@ -224,6 +224,8 @@
     text-align: center;
     min-width: 0;
     border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
 }
 
 .mutator-stat-value {
@@ -267,7 +269,7 @@
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin-top: 4px;
+    margin-top: auto;
     display: block;
 }
 
